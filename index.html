@@ -66,48 +66,57 @@
     justify-content: center;
     text-align: center;
     overflow: hidden;
-    padding: 3rem 1.25rem;
-  }
-  .hero-bg {
-    position: absolute; inset: 0;
-    background-image: url('img/cover.jpeg');
-    background-size: cover;
-    background-position: center 30%;
-    background-repeat: no-repeat;
-    transform: scale(1.05);
-    animation: kenburns 20s ease-in-out infinite alternate;
-    z-index: 0;
-  }
-  .hero-bg::after {
-    content: "";
-    position: absolute; inset: 0;
-    background: linear-gradient(180deg,
-      rgba(250,246,239,0.55) 0%,
-      rgba(250,246,239,0.25) 35%,
-      rgba(250,246,239,0.55) 70%,
-      rgba(250,246,239,0.92) 100%);
-  }
-  @keyframes kenburns {
-    0%   { transform: scale(1.05) translate(0,0); }
-    100% { transform: scale(1.15) translate(-1.5%, -1%); }
+    padding: 2rem 1rem;
+    background: linear-gradient(180deg, #fffaf0 0%, #faf6ef 100%);
   }
 
-  .hero-frame {
-    position: relative; z-index: 2;
-    max-width: 560px; width: 100%;
-    padding: 2.8rem 1.6rem 3.2rem;
-    background: rgba(255,255,255,0.55);
-    backdrop-filter: blur(8px);
-    border: 1px solid var(--gold-line);
-    box-shadow:
-      inset 0 0 0 6px rgba(255,255,255,0.6),
-      inset 0 0 0 7px var(--gold-line),
-      0 10px 40px rgba(120,90,30,0.12);
-    animation: frameIn 1.2s ease both;
+  /* Decorative archway illustration as full backdrop */
+  .hero-card {
+    position: relative;
+    width: 100%;
+    max-width: 560px;
+    aspect-ratio: 530/746; /* matches photo2 proportions */
+    margin: 0 auto;
+    box-shadow: 0 20px 60px rgba(120,90,30,0.18);
+    animation: frameIn 1.3s ease both;
+    overflow: hidden;
+    background: #fff;
+  }
+  .hero-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url('img/photo2.jpeg');
+    background-size: cover;
+    background-position: center;
+    z-index: 0;
+    animation: kenburns 22s ease-in-out infinite alternate;
+  }
+  @keyframes kenburns {
+    0%   { transform: scale(1.0); }
+    100% { transform: scale(1.06); }
   }
   @keyframes frameIn {
     from { opacity: 0; transform: translateY(30px) scale(0.96); }
     to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  /* Text overlay inside the arch's empty space */
+  .hero-frame {
+    position: absolute;
+    z-index: 2;
+    top: 14%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 78%;
+    max-width: 420px;
+    text-align: center;
+    animation: frameIn 1.4s 0.25s ease both;
+  }
+
+  @media (max-width: 480px) {
+    .hero-card { max-width: 95vw; }
+    .hero-frame { top: 13%; width: 82%; }
   }
 
   .kicker {
@@ -130,10 +139,10 @@
 
   .names {
     font-family: 'Great Vibes', cursive;
-    font-size: clamp(3.8rem, 14vw, 6.5rem);
+    font-size: clamp(2.8rem, 10vw, 4.2rem);
     color: var(--ink);
     line-height: 0.95;
-    margin: 1.5rem 0 0.2rem;
+    margin: 1rem 0 0.2rem;
     font-weight: 400;
   }
   .names .n1 { display: inline-block; opacity: 0; animation: fadeRight 1s 0.8s forwards; }
@@ -142,7 +151,7 @@
     display: block;
     font-family: 'Cormorant Garamond', serif;
     font-style: italic;
-    font-size: 1.8rem;
+    font-size: 1.4rem;
     color: var(--gold);
     opacity: 0;
     animation: popIn 0.7s 1s forwards;
@@ -150,10 +159,10 @@
 
   .save-label {
     font-family: 'Cinzel', serif;
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     letter-spacing: 0.35em;
     color: var(--gold-dark);
-    margin-top: 1.8rem;
+    margin-top: 1.2rem;
     opacity: 0;
     animation: fadeUp 1s 1.3s forwards;
   }
@@ -170,11 +179,14 @@
 
   .save-date {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 1.6rem;
-    letter-spacing: 0.25em;
+    font-size: 1.3rem;
+    letter-spacing: 0.2em;
     color: var(--ink);
     opacity: 0;
     animation: fadeUp 1s 1.6s forwards;
+  }
+  .kicker, .subkicker {
+    text-shadow: 0 1px 0 rgba(255,255,255,0.6);
   }
 
   .scroll-hint {
@@ -395,7 +407,9 @@
   .photo img {
     width: 100%; height: 100%;
     object-fit: cover;
+    object-position: center 20%;
     transition: transform 0.9s ease;
+    display: block;
   }
   .photo:hover img { transform: scale(1.07); }
 
@@ -484,21 +498,21 @@
 
 <!-- ─────────── HERO ─────────── -->
 <section class="hero">
-  <div class="hero-bg"></div>
+  <div class="hero-card">
+    <div class="hero-frame">
+      <p class="kicker">THE WEDDING OF</p>
+      <p class="subkicker">We are getting married</p>
 
-  <div class="hero-frame">
-    <p class="kicker">THE WEDDING OF</p>
-    <p class="subkicker">We are getting married</p>
+      <h1 class="names">
+        <span class="n1">Ibrahim</span>
+        <span class="amp">&amp;</span>
+        <span class="n2">Omnia</span>
+      </h1>
 
-    <h1 class="names">
-      <span class="n1">Ibrahim</span>
-      <span class="amp">&amp;</span>
-      <span class="n2">Omnia</span>
-    </h1>
-
-    <p class="save-label">SAVE THE DATE</p>
-    <div class="gold-line"></div>
-    <p class="save-date">8 MAY 2026</p>
+      <p class="save-label">SAVE THE DATE</p>
+      <div class="gold-line"></div>
+      <p class="save-date">8 MAY 2026</p>
+    </div>
   </div>
 
   <div class="scroll-hint">
