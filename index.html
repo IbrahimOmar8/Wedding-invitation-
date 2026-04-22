@@ -101,22 +101,34 @@
     to   { opacity: 1; transform: translateY(0) scale(1); }
   }
 
-  /* Text overlay inside the arch's empty space */
+  /* Text sits inside the arch — no panel, just a soft radial glow behind */
   .hero-frame {
     position: absolute;
     z-index: 2;
-    top: 14%;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 78%;
-    max-width: 420px;
+    top: 23%;
+    left: 26%;
+    width: calc(100% - 2.5rem);
+    max-width: 360px;
+    padding: 0 0.8rem;
     text-align: center;
+    box-sizing: border-box;
+    word-wrap: break-word;
     animation: frameIn 1.4s 0.25s ease both;
+  }
+  .hero-frame::before {
+    content: "";
+    position: absolute;
+    inset: -8% -10%;
+    background: radial-gradient(ellipse at center,
+      rgba(255,250,240,0.85) 0%,
+      rgba(255,250,240,0.5) 45%,
+      rgba(255,250,240,0) 75%);
+    z-index: -1;
+    pointer-events: none;
   }
 
   @media (max-width: 480px) {
     .hero-card { max-width: 95vw; }
-    .hero-frame { top: 13%; width: 82%; }
   }
 
   .kicker {
@@ -139,11 +151,13 @@
 
   .names {
     font-family: 'Great Vibes', cursive;
-    font-size: clamp(2.8rem, 10vw, 4.2rem);
+    font-size: clamp(2.2rem, 7vw, 3.4rem);
     color: var(--ink);
-    line-height: 0.95;
-    margin: 1rem 0 0.2rem;
+    line-height: 1;
+    margin: 0.8rem 0 0.2rem;
     font-weight: 400;
+    white-space: normal;
+    word-break: normal;
   }
   .names .n1 { display: inline-block; opacity: 0; animation: fadeRight 1s 0.8s forwards; }
   .names .n2 { display: inline-block; opacity: 0; animation: fadeLeft  1s 1.1s forwards; }
@@ -185,8 +199,11 @@
     opacity: 0;
     animation: fadeUp 1s 1.6s forwards;
   }
-  .kicker, .subkicker {
-    text-shadow: 0 1px 0 rgba(255,255,255,0.6);
+  .kicker, .subkicker, .save-label, .save-date, .names, .amp {
+    text-shadow:
+      0 0 18px rgba(255,250,240,0.95),
+      0 0 8px rgba(255,250,240,0.9),
+      0 1px 2px rgba(255,255,255,0.9);
   }
 
   .scroll-hint {
@@ -609,23 +626,6 @@
         GET DIRECTIONS
       </a>
     </div>
-  </div>
-</section>
-
-
-<!-- ─────────── GALLERY ─────────── -->
-<section class="block gallery">
-  <div class="center">
-    <p class="label reveal">Our Moments</p>
-    <h2 class="title reveal delay-1">A Love Story in Pictures</h2>
-    <div class="divider reveal delay-1"><span></span><i>&#9829;</i><span></span></div>
-  </div>
-
-  <div class="photo-grid">
-    <div class="photo wide reveal"><img src="img/photo1.jpeg" alt="Ibrahim & Omnia"></div>
-    <div class="photo reveal delay-1"><img src="img/photo2.jpeg" alt="Ibrahim & Omnia"></div>
-    <div class="photo reveal delay-2"><img src="img/photo3.jpeg" alt="Ibrahim & Omnia"></div>
-    <div class="photo reveal delay-3"><img src="img/photo4.jpeg" alt="Ibrahim & Omnia"></div>
   </div>
 </section>
 
