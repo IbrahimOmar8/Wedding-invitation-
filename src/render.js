@@ -3,6 +3,8 @@ const path = require('path');
 const db = require('./db');
 const { t, months, weekdays } = require('./i18n');
 const { escapeHtml, safeUrl } = require('./util');
+const wl = require('./wishlisty');
+const { getWishlistyToken } = require('./wlToken');
 
 const THEMES_DIR = path.join(__dirname, '..', 'views', 'themes');
 const cache = new Map();
@@ -77,6 +79,57 @@ function renderRegistry(invId) {
   </a>`).join('\n');
 }
 
+const WL_CACHE = new Map();
+const WL_TTL_MS = 5 * 60 * 1000;
+
+async function renderWishlistyRegistry(userId, wishlistId) {
+  if (!wishlistId) return '';
+  const key = `${userId}:${wishlistId}`;
+  const cached = WL_CACHE.get(key);
+  if (cached && cached.expires > Date.now()) return cached.html;
+
+  let html = '';
+  try {
+    const token = await getWishlistyToken(userId);
+    if (!token) return '';
+    const result = await wl.getWishlist(token, wishlistId);
+    // wish-listy response shapes vary: result.data.wishlist or result.data
+    const wishlist = result?.data?.wishlist || result?.wishlist || result?.data || result;
+    const items = wishlist?.items || [];
+    const wishlistyAppUrl = `${wl.baseUrl}/api/wishlists/${wishlistId}`;
+
+    if (items.length) {
+      html = items.map(item => {
+        const img = item.image ? `<div class="wl-thumb"><img src="${escapeHtml(item.image)}" alt=""></div>` : '<div class="wl-thumb wl-thumb-empty">🎁</div>';
+        const purchased = item.isPurchased ? '<span class="wl-tag wl-tag-purchased">Already gifted</span>' : (item.reservedUntil ? '<span class="wl-tag wl-tag-reserved">Reserved</span>' : '');
+        const reserveUrl = `${wl.baseUrl.replace(/\/api$/, '')}/?reserve=${encodeURIComponent(item._id || item.id)}`;
+        const linkUrl = safeUrl(item.url);
+        return `<div class="wl-item ${item.isPurchased ? 'wl-disabled' : ''}">
+          ${img}
+          <div class="wl-body">
+            <h3>${escapeHtml(item.name)}</h3>
+            ${item.description ? `<p>${escapeHtml(item.description)}</p>` : ''}
+            ${item.storeName ? `<div class="wl-store">${escapeHtml(item.storeName)}</div>` : ''}
+            ${purchased}
+            <div class="wl-actions">
+              ${linkUrl ? `<a class="wl-btn wl-btn-link" href="${escapeHtml(linkUrl)}" target="_blank" rel="noopener">View Store</a>` : ''}
+              ${!item.isPurchased ? `<a class="wl-btn wl-btn-reserve" href="${escapeHtml(reserveUrl)}" target="_blank" rel="noopener">Reserve via Wish Listy</a>` : ''}
+            </div>
+          </div>
+        </div>`;
+      }).join('\n');
+    }
+  } catch (_) {
+    html = '';
+  }
+  WL_CACHE.set(key, { html, expires: Date.now() + WL_TTL_MS });
+  return html;
+}
+
+function clearWishlistyCache(userId) {
+  for (const k of WL_CACHE.keys()) if (k.startsWith(userId + ':')) WL_CACHE.delete(k);
+}
+
 function renderWishes(invId) {
   const wishes = db.prepare('SELECT * FROM wishes WHERE invitation_id = ? AND approved = 1 ORDER BY created_at DESC LIMIT 30').all(invId);
   if (!wishes.length) return '';
@@ -86,7 +139,7 @@ function renderWishes(invId) {
   </div>`).join('\n');
 }
 
-function render(invitation, slug, guest = null) {
+async function render(invitation, slug, guest = null) {
   const lang = invitation.language === 'ar' ? 'ar' : 'en';
   const T = t(lang);
   const tpl = loadTheme(invitation.theme);
@@ -116,6 +169,12 @@ function render(invitation, slug, guest = null) {
   const registryHtml = renderRegistry(invitation.id);
   const wishesHtml = renderWishes(invitation.id);
 
+  // Wish Listy registry — async fetch via stored token
+  const ownerRow = db.prepare('SELECT id, wishlisty_wishlist_id FROM users WHERE id = ?').get(invitation.user_id);
+  const wishlistyRegistryHtml = ownerRow?.wishlisty_wishlist_id
+    ? await renderWishlistyRegistry(ownerRow.id, ownerRow.wishlisty_wishlist_id)
+    : '';
+
   const guestGreeting = guest
     ? `<div class="guest-greeting"><span class="gg-label">${escapeHtml(T.HELLO_GUEST)}</span><span class="gg-name">${escapeHtml(guest.name)}</span><span class="gg-note">${escapeHtml(T.PERSONAL_NOTE)}</span></div>`
     : '';
@@ -138,6 +197,7 @@ function render(invitation, slug, guest = null) {
     EVENTS_HTML: eventsHtml,
     STORY_HTML: storyHtml,
     REGISTRY_HTML: registryHtml,
+    WISHLISTY_REGISTRY_HTML: wishlistyRegistryHtml,
     WISHES_HTML: wishesHtml,
     GUEST_GREETING: guestGreeting,
     GUEST_NAME: escapeHtml(guest?.name || ''),
@@ -153,4 +213,4 @@ function render(invitation, slug, guest = null) {
   return tpl.replace(/\{\{(\w+)\}\}/g, (_, key) => (key in vars ? vars[key] : ''));
 }
 
-module.exports = { render };
+module.exports = { render, clearWishlistyCache };

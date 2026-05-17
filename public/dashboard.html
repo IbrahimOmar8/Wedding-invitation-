@@ -150,16 +150,39 @@
 
         <!-- REGISTRY -->
         <section class="section" id="section-registry">
-          <div class="page-header"><div><h1>Gift Registry</h1><p>Add links to gift lists, fund pages, or charity donations.</p></div></div>
-          <div class="card">
-            <div class="grid-2">
-              <div class="field"><label>Title</label><input type="text" id="rg-title" placeholder="e.g. Honeymoon Fund"></div>
-              <div class="field"><label>Link URL</label><input type="url" id="rg-url"></div>
-            </div>
-            <div class="field"><label>Description</label><input type="text" id="rg-desc"></div>
-            <button class="btn" id="add-registry">Add Item</button>
+          <div class="page-header"><div><h1>Gift Registry</h1><p>Powered by Wish Listy. Pick a wishlist to feature on your invitation.</p></div></div>
+
+          <div class="card" id="wl-status-card">
+            <h2>Wish Listy Connection</h2>
+            <p class="desc" id="wl-status-msg">Checking…</p>
           </div>
-          <div id="registry-list"></div>
+
+          <div class="card" id="wl-pick-card" style="display:none">
+            <h2>Pick a Wishlist</h2>
+            <p class="desc">Choose one of your Wish Listy wishlists. Items will appear in your invitation's registry section, and guests can reserve them via the Wish Listy app.</p>
+            <div class="field">
+              <label>Your Wishlists</label>
+              <select id="wl-select"><option value="">-- choose --</option></select>
+            </div>
+            <button class="btn" id="wl-select-btn">Use this wishlist</button>
+            <button class="btn secondary" id="wl-disconnect-btn" style="margin-left:0.5rem">Clear selection</button>
+          </div>
+
+          <div class="card" id="wl-create-card" style="display:none">
+            <h2>Or Create a New One</h2>
+            <div class="grid-2">
+              <div class="field"><label>Name</label><input type="text" id="wl-new-name" placeholder="Our Wedding Wishlist"></div>
+              <div class="field"><label>Privacy</label><select id="wl-new-privacy"><option value="public">Public</option><option value="friends">Friends</option><option value="private">Private</option></select></div>
+            </div>
+            <div class="field"><label>Description</label><input type="text" id="wl-new-desc"></div>
+            <button class="btn" id="wl-create-btn">Create Wishlist in Wish Listy</button>
+          </div>
+
+          <div class="card" id="wl-items-card" style="display:none">
+            <h2>Items in selected wishlist</h2>
+            <div id="wl-items-list"></div>
+            <p class="desc" style="margin-top:1rem">Add or edit items directly in the Wish Listy app — changes appear here within ~5 minutes.</p>
+          </div>
         </section>
 
         <!-- THEME -->

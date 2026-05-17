@@ -12,9 +12,18 @@ db.pragma('foreign_keys = ON');
 db.exec(`
   CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    email TEXT UNIQUE NOT NULL,
-    password_hash TEXT NOT NULL,
+    email TEXT UNIQUE,
+    password_hash TEXT,
     slug TEXT UNIQUE NOT NULL,
+    full_name TEXT DEFAULT '',
+    username TEXT,
+    country_code TEXT DEFAULT '',
+    wishlisty_user_id TEXT,
+    wishlisty_access_token TEXT,
+    wishlisty_refresh_token TEXT,
+    wishlisty_token_expires_at TEXT,
+    wishlisty_event_id TEXT,
+    wishlisty_wishlist_id TEXT,
     created_at TEXT DEFAULT CURRENT_TIMESTAMP
   );
 
@@ -118,5 +127,14 @@ function addColumnIfMissing(table, column, type) {
   }
 }
 addColumnIfMissing('invitations', 'view_count', 'INTEGER DEFAULT 0');
+addColumnIfMissing('users', 'full_name', "TEXT DEFAULT ''");
+addColumnIfMissing('users', 'username', 'TEXT');
+addColumnIfMissing('users', 'country_code', "TEXT DEFAULT ''");
+addColumnIfMissing('users', 'wishlisty_user_id', 'TEXT');
+addColumnIfMissing('users', 'wishlisty_access_token', 'TEXT');
+addColumnIfMissing('users', 'wishlisty_refresh_token', 'TEXT');
+addColumnIfMissing('users', 'wishlisty_token_expires_at', 'TEXT');
+addColumnIfMissing('users', 'wishlisty_event_id', 'TEXT');
+addColumnIfMissing('users', 'wishlisty_wishlist_id', 'TEXT');
 
 module.exports = db;

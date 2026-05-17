@@ -17,6 +17,7 @@ const eventsRoutes = require('./src/routes/events');
 const storyRoutes = require('./src/routes/story');
 const registryRoutes = require('./src/routes/registry');
 const accountRoutes = require('./src/routes/account');
+const wishlistsRoutes = require('./src/routes/wishlists');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -37,6 +38,7 @@ app.use('/api/events', eventsRoutes);
 app.use('/api/story', storyRoutes);
 app.use('/api/registry', registryRoutes);
 app.use('/api/account', accountRoutes);
+app.use('/api/wishlisty', wishlistsRoutes);
 
 app.get('/api/themes', (req, res) => {
   const dir = path.join(__dirname, 'views', 'themes');
@@ -44,7 +46,7 @@ app.get('/api/themes', (req, res) => {
   res.json({ themes: files.map(f => f.replace('.html', '')) });
 });
 
-function renderInvitation(slug, guestToken, res) {
+async function renderInvitation(slug, guestToken, res) {
   const user = db.prepare('SELECT id FROM users WHERE slug = ?').get(slug);
   if (!user) return res.status(404).sendFile(path.join(__dirname, 'public', '404.html'));
   const row = db.prepare('SELECT * FROM invitations WHERE user_id = ?').get(user.id);
@@ -55,18 +57,23 @@ function renderInvitation(slug, guestToken, res) {
     guest = db.prepare('SELECT * FROM guests WHERE token = ? AND invitation_id = ?').get(guestToken, row.id);
   }
 
-  // Increment view count (best-effort)
   try { db.prepare('UPDATE invitations SET view_count = view_count + 1 WHERE id = ?').run(row.id); } catch (_) {}
 
   const invitation = parseInvitation(row);
-  res.set('Content-Type', 'text/html; charset=utf-8');
-  res.send(render(invitation, slug, guest));
+  try {
+    const html = await render(invitation, slug, guest);
+    res.set('Content-Type', 'text/html; charset=utf-8');
+    res.send(html);
+  } catch (e) {
+    console.error('Render error:', e.message);
+    res.status(500).send('Failed to render invitation');
+  }
 }
 
 app.get('/i/:slug', (req, res) => renderInvitation(req.params.slug, null, res));
 app.get('/i/:slug/g/:token', (req, res) => renderInvitation(req.params.slug, req.params.token, res));
 
-['login', 'signup', 'dashboard'].forEach(page => {
+['login', 'signup', 'dashboard', 'verify-otp'].forEach(page => {
   app.get('/' + page, (req, res) => res.sendFile(path.join(__dirname, 'public', `${page}.html`)));
 });
 

@@ -68,7 +68,7 @@ document.querySelectorAll('.nav-item[data-section]').forEach(btn => {
     if (id === 'wishes') loadWishes();
     if (id === 'events') loadEvents();
     if (id === 'story') loadStory();
-    if (id === 'registry') loadRegistry();
+    if (id === 'registry') loadWishlistyStatus();
     if (id === 'guests') loadGuests();
     document.getElementById('sidebar').classList.remove('open');
     document.getElementById('sidebar-backdrop').classList.remove('open');
@@ -322,39 +322,115 @@ document.getElementById('add-story').addEventListener('click', async () => {
   } catch (ex) { toast(ex.message, 'error'); }
 });
 
-// ─── Registry ───
-async function loadRegistry() {
-  const { registry } = await api('/api/registry');
-  const list = document.getElementById('registry-list');
-  if (!registry.length) { list.innerHTML = '<div class="empty-state"><div class="ic">&#127873;</div><p>No registry items yet.</p></div>'; return; }
-  list.innerHTML = registry.map(r => `
-    <div class="item-row" data-id="${r.id}">
-      <div class="ir-body">
-        <h3>${escapeHtml(r.title)}</h3>
-        ${r.url ? `<div class="meta"><a href="${escapeHtml(r.url)}" target="_blank">${escapeHtml(r.url)}</a></div>` : ''}
-        ${r.description ? `<p>${escapeHtml(r.description)}</p>` : ''}
-      </div>
-      <div class="ir-actions"><button class="del" data-id="${r.id}">Delete</button></div>
-    </div>`).join('');
-  list.querySelectorAll('.del').forEach(b => b.addEventListener('click', async () => {
-    if (!confirm('Remove this item?')) return;
-    await api('/api/registry/' + b.dataset.id, { method: 'DELETE' });
-    loadRegistry(); refreshPreview();
-  }));
+// ─── Wish Listy Registry ───
+async function loadWishlistyStatus() {
+  const msg = document.getElementById('wl-status-msg');
+  const pickCard = document.getElementById('wl-pick-card');
+  const createCard = document.getElementById('wl-create-card');
+  const itemsCard = document.getElementById('wl-items-card');
+  try {
+    const status = await api('/api/wishlisty/_status');
+    if (!status.connected) {
+      msg.innerHTML = `<span style="color:var(--error)">Not connected.</span> Sign out and re-register/login via WedCard to link your Wish Listy account.`;
+      pickCard.style.display = 'none'; createCard.style.display = 'none'; itemsCard.style.display = 'none';
+      return;
+    }
+    msg.innerHTML = `<span style="color:var(--success)">✓ Connected to Wish Listy</span> · base: <code>${escapeHtml(status.base_url)}</code>`;
+    pickCard.style.display = ''; createCard.style.display = '';
+    if (status.has_wishlist) {
+      itemsCard.style.display = '';
+      loadWishlistyItems();
+    } else {
+      itemsCard.style.display = 'none';
+    }
+    loadWishlistOptions(status);
+  } catch (ex) {
+    msg.innerHTML = `<span style="color:var(--error)">Error: ${escapeHtml(ex.message)}</span>`;
+  }
 }
 
-document.getElementById('add-registry').addEventListener('click', async () => {
-  const body = {
-    title: document.getElementById('rg-title').value,
-    url: document.getElementById('rg-url').value,
-    description: document.getElementById('rg-desc').value,
-  };
-  if (!body.title) return toast('Title required', 'error');
+async function loadWishlistOptions(status) {
+  const sel = document.getElementById('wl-select');
+  sel.innerHTML = '<option value="">-- loading… --</option>';
   try {
-    await api('/api/registry', { method: 'POST', body: JSON.stringify(body) });
-    ['rg-title', 'rg-url', 'rg-desc'].forEach(id => document.getElementById(id).value = '');
-    loadRegistry(); refreshPreview(); toast('Added!');
+    const res = await api('/api/wishlisty');
+    const list = res?.data?.wishlists || res?.wishlists || res?.data || [];
+    sel.innerHTML = '<option value="">-- choose --</option>';
+    list.forEach(w => {
+      const opt = document.createElement('option');
+      opt.value = w._id || w.id; opt.textContent = w.name || 'Untitled';
+      if ((w._id || w.id) === (invitation && invitation.wishlisty_wishlist_id)) opt.selected = true;
+      sel.appendChild(opt);
+    });
+    if (!list.length) sel.innerHTML = '<option value="">(no wishlists yet — create one below)</option>';
+  } catch (ex) {
+    sel.innerHTML = `<option value="">(failed to load: ${escapeHtml(ex.message)})</option>`;
+  }
+}
+
+async function loadWishlistyItems() {
+  const me = await api('/api/auth/me');
+  const wid = me.user?.wishlisty_wishlist_id;
+  const box = document.getElementById('wl-items-list');
+  if (!wid) { box.innerHTML = '<p class="desc">No wishlist selected.</p>'; return; }
+  box.innerHTML = '<p class="desc">Loading items…</p>';
+  try {
+    const res = await api('/api/wishlisty/' + wid);
+    const wishlist = res?.data?.wishlist || res?.wishlist || res?.data || res;
+    const items = wishlist?.items || [];
+    if (!items.length) { box.innerHTML = '<p class="desc">This wishlist has no items yet. Add some in the Wish Listy app.</p>'; return; }
+    box.innerHTML = items.map(i => `
+      <div class="item-row">
+        <div class="ir-body">
+          <h3>${escapeHtml(i.name)}${i.isPurchased ? ' <span style="color:var(--success);font-size:0.85em">(gifted)</span>' : ''}${i.reservedUntil ? ' <span style="color:var(--gold-d);font-size:0.85em">(reserved)</span>' : ''}</h3>
+          ${i.description ? `<p>${escapeHtml(i.description)}</p>` : ''}
+          ${i.storeName ? `<div class="meta">Store: ${escapeHtml(i.storeName)}</div>` : ''}
+        </div>
+      </div>`).join('');
+  } catch (ex) {
+    box.innerHTML = `<p class="desc" style="color:var(--error)">Failed to load: ${escapeHtml(ex.message)}</p>`;
+  }
+}
+
+document.getElementById('wl-select-btn')?.addEventListener('click', async (e) => {
+  const id = document.getElementById('wl-select').value;
+  if (!id) return toast('Pick a wishlist first', 'error');
+  e.target.disabled = true;
+  try {
+    await api('/api/wishlisty/select', { method: 'POST', body: JSON.stringify({ wishlist_id: id }) });
+    toast('Wishlist linked to your invitation!');
+    loadWishlistyStatus(); refreshPreview();
   } catch (ex) { toast(ex.message, 'error'); }
+  finally { e.target.disabled = false; }
+});
+
+document.getElementById('wl-disconnect-btn')?.addEventListener('click', async () => {
+  if (!confirm('Remove the linked wishlist from your invitation?')) return;
+  try {
+    await api('/api/wishlisty/disconnect', { method: 'POST' });
+    toast('Wishlist removed.'); loadWishlistyStatus(); refreshPreview();
+  } catch (ex) { toast(ex.message, 'error'); }
+});
+
+document.getElementById('wl-create-btn')?.addEventListener('click', async (e) => {
+  const body = {
+    name: document.getElementById('wl-new-name').value,
+    description: document.getElementById('wl-new-desc').value,
+    privacy: document.getElementById('wl-new-privacy').value,
+    category: 'wedding',
+  };
+  if (!body.name) return toast('Name required', 'error');
+  e.target.disabled = true;
+  try {
+    const res = await api('/api/wishlisty', { method: 'POST', body: JSON.stringify(body) });
+    const created = res?.data?.wishlist || res?.wishlist || res?.data;
+    const id = created?._id || created?.id;
+    if (id) await api('/api/wishlisty/select', { method: 'POST', body: JSON.stringify({ wishlist_id: id }) });
+    toast('Wishlist created!');
+    ['wl-new-name', 'wl-new-desc'].forEach(i => document.getElementById(i).value = '');
+    loadWishlistyStatus(); refreshPreview();
+  } catch (ex) { toast(ex.message, 'error'); }
+  finally { e.target.disabled = false; }
 });
 
 // ─── Guests ───

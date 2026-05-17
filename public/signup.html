@@ -13,13 +13,20 @@
   <a href="/" class="brand">WedCard</a>
   <p class="tagline">Create Your Wedding Invitation</p>
   <h1>Create your account</h1>
+  <p style="text-align:center;font-size:0.85rem;color:#6b6354;margin:-0.8rem 0 1.5rem;font-style:italic">Powered by Wish Listy</p>
 
   <div class="error-box" id="err"></div>
 
   <form id="signup-form" autocomplete="off">
     <div class="field">
-      <label for="email">Email</label>
-      <input type="email" id="email" name="email" required autocomplete="email">
+      <label for="fullName">Full Name</label>
+      <input type="text" id="fullName" name="fullName" required minlength="2" maxlength="80">
+    </div>
+
+    <div class="field">
+      <label for="username">Email or Phone</label>
+      <input type="text" id="username" name="username" required placeholder="you@email.com or +20123…">
+      <p class="hint">You'll receive a verification code here.</p>
     </div>
 
     <div class="field">
@@ -44,7 +51,6 @@
   const slugInput = document.getElementById('slug');
   const slugHint = document.getElementById('slug-hint');
   let slugTimer;
-
   slugInput.addEventListener('input', () => {
     const val = slugInput.value.toLowerCase().replace(/[^a-z0-9-]/g, '');
     if (slugInput.value !== val) slugInput.value = val;
@@ -60,26 +66,26 @@
 
   document.getElementById('signup-form').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const btn = document.getElementById('submit-btn');
-    const err = document.getElementById('err');
-    err.classList.remove('show');
-    btn.disabled = true; btn.textContent = 'Creating...';
-
+    const btn = document.getElementById('submit-btn'); const err = document.getElementById('err');
+    err.classList.remove('show'); btn.disabled = true; btn.textContent = 'Creating…';
     const body = {
-      email: document.getElementById('email').value,
-      slug: document.getElementById('slug').value,
+      fullName: document.getElementById('fullName').value,
+      username: document.getElementById('username').value.trim(),
       password: document.getElementById('password').value,
+      slug: document.getElementById('slug').value,
     };
     try {
       const r = await fetch('/api/auth/signup', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
       const data = await r.json();
       if (!r.ok) throw new Error(data.error || 'Sign up failed');
-      localStorage.setItem('wc_token', data.token);
-      localStorage.setItem('wc_user', JSON.stringify(data.user));
-      window.location.href = '/dashboard';
+      // Stash details and redirect to OTP page
+      sessionStorage.setItem('wc_pending', JSON.stringify({
+        username: body.username, slug: body.slug, password: body.password,
+        verificationMethod: data.verificationMethod || 'email'
+      }));
+      window.location.href = '/verify-otp';
     } catch (ex) {
-      err.textContent = ex.message;
-      err.classList.add('show');
+      err.textContent = ex.message; err.classList.add('show');
       btn.disabled = false; btn.textContent = 'Create Account';
     }
   });

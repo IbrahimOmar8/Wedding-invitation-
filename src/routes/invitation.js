@@ -1,6 +1,8 @@
 const express = require('express');
 const db = require('../db');
 const { authRequired } = require('../auth');
+const wl = require('../wishlisty');
+const { getWishlistyToken } = require('../wlToken');
 
 const router = express.Router();
 
@@ -26,7 +28,7 @@ router.get('/', authRequired, (req, res) => {
   res.json({ invitation: parseInvitation(row), user: req.user });
 });
 
-router.put('/', authRequired, (req, res) => {
+router.put('/', authRequired, async (req, res) => {
   const updates = {};
   for (const field of EDITABLE_FIELDS) {
     if (req.body[field] !== undefined) updates[field] = req.body[field];
@@ -48,8 +50,51 @@ router.put('/', authRequired, (req, res) => {
     .run(...values, req.user.id);
 
   const row = db.prepare('SELECT * FROM invitations WHERE user_id = ?').get(req.user.id);
+
+  // Best-effort sync to wish-listy Event. Fail silently — wedding details
+  // in our DB are the source of truth for the public invitation page.
+  syncEventToWishlisty(req.user.id, row).catch(() => {});
+
   res.json({ invitation: parseInvitation(row) });
 });
+
+async function syncEventToWishlisty(userId, invitation) {
+  if (!invitation) return;
+  const u = db.prepare('SELECT wishlisty_user_id, wishlisty_event_id, wishlisty_wishlist_id FROM users WHERE id = ?').get(userId);
+  if (!u?.wishlisty_user_id) return;
+  const token = await getWishlistyToken(userId);
+  if (!token) return;
+
+  const d = new Date(invitation.wedding_date || Date.now());
+  if (isNaN(d.getTime())) return;
+  const pad = n => String(n).padStart(2, '0');
+  const date = `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}`;
+  const time = `${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}`;
+
+  const payload = {
+    name: `${invitation.groom_name || ''} & ${invitation.bride_name || ''} Wedding`.trim(),
+    description: invitation.quote || '',
+    date,
+    time,
+    type: 'wedding',
+    privacy: invitation.published ? 'public' : 'private',
+    mode: 'in_person',
+    location: [invitation.venue_name, invitation.venue_address].filter(Boolean).join(' — ') || 'TBD',
+  };
+
+  if (u.wishlisty_event_id) {
+    await wl.updateEvent(token, u.wishlisty_event_id, payload);
+  } else {
+    const result = await wl.createEvent(token, payload);
+    const eventId = result?.data?.event?._id || result?.data?.event?.id || result?.event?._id || result?.event?.id;
+    if (eventId) {
+      db.prepare('UPDATE users SET wishlisty_event_id = ? WHERE id = ?').run(String(eventId), userId);
+      if (u.wishlisty_wishlist_id) {
+        try { await wl.linkWishlistToEvent(token, eventId, u.wishlisty_wishlist_id); } catch (_) {}
+      }
+    }
+  }
+}
 
 // Gallery management
 router.post('/gallery', authRequired, (req, res) => {
