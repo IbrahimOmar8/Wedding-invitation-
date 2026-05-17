@@ -11,7 +11,7 @@ const EDITABLE_FIELDS = [
   'hero_image', 'theme', 'language', 'published'
 ];
 
-const VALID_THEMES = new Set(['elegant', 'royal', 'garden']);
+const VALID_THEMES = new Set(['elegant', 'royal', 'garden', 'minimal', 'rustic', 'beach']);
 const VALID_LANGS = new Set(['en', 'ar']);
 
 function parseInvitation(row) {

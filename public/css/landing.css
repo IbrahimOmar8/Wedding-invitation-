@@ -71,6 +71,9 @@ body { background: var(--cream); color: var(--ink); font-family: 'Cormorant Gara
 .theme-elegant .theme-preview { background: linear-gradient(135deg, #faf6ef 0%, #d6b66a 100%); }
 .theme-royal .theme-preview { background: linear-gradient(135deg, #0e1a3a 0%, #d4af37 100%); }
 .theme-garden .theme-preview { background: linear-gradient(135deg, #bcd4b8 0%, #5d7d5a 100%); }
+.theme-minimal .theme-preview { background: linear-gradient(135deg, #fafafa 0%, #0a0a0a 100%); }
+.theme-rustic .theme-preview { background: linear-gradient(135deg, #f5ecd9 0%, #6b4a2b 100%); }
+.theme-beach .theme-preview { background: linear-gradient(135deg, #b8e3ed 0%, #ff8a73 100%); }
 .theme-card h3 { padding: 1.2rem 1.5rem 0.4rem; font-family: 'Cinzel', serif; font-size: 1rem; letter-spacing: 0.2em; }
 .theme-card p { padding: 0 1.5rem 1.5rem; color: var(--ink-soft); }
 

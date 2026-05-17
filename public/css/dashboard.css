@@ -92,6 +92,9 @@ body { background: #f7f3eb; color: var(--ink); font-family: 'Cormorant Garamond'
 .theme-option[data-theme=elegant] .preview { background: linear-gradient(135deg, #faf6ef 0%, #d6b66a 100%); }
 .theme-option[data-theme=royal] .preview { background: linear-gradient(135deg, #0e1a3a 0%, #d4af37 100%); }
 .theme-option[data-theme=garden] .preview { background: linear-gradient(135deg, #bcd4b8 0%, #5d7d5a 100%); }
+.theme-option[data-theme=minimal] .preview { background: linear-gradient(135deg, #fafafa 0%, #0a0a0a 100%); }
+.theme-option[data-theme=rustic] .preview { background: linear-gradient(135deg, #f5ecd9 0%, #6b4a2b 100%); }
+.theme-option[data-theme=beach] .preview { background: linear-gradient(135deg, #b8e3ed 0%, #ff8a73 100%); }
 .theme-option h3 { padding: 0.7rem 1rem 0.2rem; font-family: 'Cinzel', serif; font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink); }
 .theme-option p { padding: 0 1rem 1rem; color: var(--ink-soft); font-size: 0.85rem; }
 
