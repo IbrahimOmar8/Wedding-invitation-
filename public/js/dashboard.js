@@ -354,7 +354,7 @@ async function loadWishlistOptions(status) {
   sel.innerHTML = '<option value="">-- loading… --</option>';
   try {
     const res = await api('/api/wishlisty');
-    const list = res?.data?.wishlists || res?.wishlists || res?.data || [];
+    const list = res?.wishlists || res?.data?.wishlists || res?.data || [];
     sel.innerHTML = '<option value="">-- choose --</option>';
     list.forEach(w => {
       const opt = document.createElement('option');
@@ -423,7 +423,7 @@ document.getElementById('wl-create-btn')?.addEventListener('click', async (e) =>
   e.target.disabled = true;
   try {
     const res = await api('/api/wishlisty', { method: 'POST', body: JSON.stringify(body) });
-    const created = res?.data?.wishlist || res?.wishlist || res?.data;
+    const created = res?.wishlist || res?.data?.wishlist || res?.data;
     const id = created?._id || created?.id;
     if (id) await api('/api/wishlisty/select', { method: 'POST', body: JSON.stringify({ wishlist_id: id }) });
     toast('Wishlist created!');

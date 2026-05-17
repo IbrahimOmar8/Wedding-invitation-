@@ -51,9 +51,11 @@ router.put('/', authRequired, async (req, res) => {
 
   const row = db.prepare('SELECT * FROM invitations WHERE user_id = ?').get(req.user.id);
 
-  // Best-effort sync to wish-listy Event. Fail silently — wedding details
-  // in our DB are the source of truth for the public invitation page.
-  syncEventToWishlisty(req.user.id, row).catch(() => {});
+  // Best-effort sync to wish-listy Event. Errors are logged but never
+  // bubble up — wedding details in our DB are the source of truth.
+  syncEventToWishlisty(req.user.id, row).catch(e => {
+    console.error('[wishlisty.event.sync]', e.status || '', e.message, e.data ? JSON.stringify(e.data).slice(0, 300) : '');
+  });
 
   res.json({ invitation: parseInvitation(row) });
 });
@@ -86,7 +88,10 @@ async function syncEventToWishlisty(userId, invitation) {
     await wl.updateEvent(token, u.wishlisty_event_id, payload);
   } else {
     const result = await wl.createEvent(token, payload);
-    const eventId = result?.data?.event?._id || result?.data?.event?.id || result?.event?._id || result?.event?.id;
+    // wish-listy responses: { success, data: { id, ... } } or { success, data: { event: { _id, ... } } }
+    const eventId = result?.data?.id || result?.data?._id
+                 || result?.data?.event?._id || result?.data?.event?.id
+                 || result?.event?._id || result?.event?.id;
     if (eventId) {
       db.prepare('UPDATE users SET wishlisty_event_id = ? WHERE id = ?').run(String(eventId), userId);
       if (u.wishlisty_wishlist_id) {
