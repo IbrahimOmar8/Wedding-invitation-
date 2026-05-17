@@ -1,0 +1,58 @@
+/* Shared styles for new sections across all themes.
+   Each theme defines its own color vars; this file uses them via fallbacks. */
+
+.guest-greeting { padding: 1.2rem 1.5rem; margin: 0 auto 2rem; max-width: 480px; text-align: center; background: rgba(255,255,255,0.6); border: 1px dashed currentColor; border-radius: 8px; }
+.guest-greeting .gg-label { display: block; font-size: 0.75rem; letter-spacing: 0.3em; text-transform: uppercase; opacity: 0.7; margin-bottom: 0.3rem; }
+.guest-greeting .gg-name { display: block; font-size: 1.6rem; font-weight: 600; margin: 0.4rem 0; }
+.guest-greeting .gg-note { display: block; font-size: 0.95rem; font-style: italic; opacity: 0.8; }
+
+/* Events list */
+.events-list { list-style: none; padding: 0; max-width: 720px; margin: 2rem auto 0; }
+.event-item { display: flex; gap: 1.2rem; padding: 1.2rem; margin-bottom: 1rem; background: rgba(255,255,255,0.6); border-radius: 10px; border: 1px solid rgba(0,0,0,0.08); align-items: flex-start; }
+.event-item .ev-icon { font-size: 1.6rem; flex: 0 0 auto; line-height: 1; }
+.event-item .ev-body { flex: 1; text-align: start; }
+.event-item h3 { font-size: 1.15rem; margin-bottom: 0.3rem; }
+.event-item .ev-date { font-size: 0.95rem; opacity: 0.85; margin-bottom: 0.2rem; }
+.event-item .ev-venue { font-size: 0.92rem; opacity: 0.7; }
+.event-item .ev-link { display: inline-block; margin-top: 0.5rem; font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; text-decoration: none; border-bottom: 1px solid currentColor; padding-bottom: 1px; }
+
+/* Story timeline */
+.story-list { list-style: none; padding: 0; max-width: 640px; margin: 2rem auto 0; position: relative; }
+.story-list::before { content: ""; position: absolute; left: 14px; top: 8px; bottom: 8px; width: 2px; background: currentColor; opacity: 0.3; }
+[dir=rtl] .story-list::before { left: auto; right: 14px; }
+.story-item { display: flex; gap: 1.2rem; padding: 0.6rem 0; padding-inline-start: 0.5rem; align-items: flex-start; position: relative; }
+.story-item .st-marker { flex: 0 0 auto; width: 14px; height: 14px; border-radius: 50%; background: currentColor; margin-top: 0.5rem; box-shadow: 0 0 0 4px rgba(255,255,255,0.8); position: relative; z-index: 1; }
+.story-item .st-body { flex: 1; padding: 0.4rem 1rem 1.2rem; text-align: start; }
+.story-item .st-sub { font-size: 0.75rem; letter-spacing: 0.25em; text-transform: uppercase; opacity: 0.7; margin-bottom: 0.3rem; }
+.story-item h3 { font-size: 1.2rem; margin-bottom: 0.4rem; }
+.story-item p { opacity: 0.85; font-size: 0.98rem; line-height: 1.5; }
+
+/* Wishes wall */
+.wishes-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; max-width: 880px; margin: 2rem auto 0; }
+.wish { padding: 1.2rem; background: rgba(255,255,255,0.7); border-radius: 8px; border: 1px solid rgba(0,0,0,0.06); text-align: start; }
+.wish-msg { font-style: italic; font-size: 0.98rem; line-height: 1.45; }
+.wish-name { margin-top: 0.6rem; font-size: 0.85rem; opacity: 0.7; }
+
+.wish-form { max-width: 480px; margin: 1.5rem auto 0; padding: 1.5rem; background: rgba(255,255,255,0.7); border-radius: 10px; }
+.wish-form label { display: block; font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase; opacity: 0.7; margin: 0.8rem 0 0.3rem; }
+.wish-form input, .wish-form textarea { width: 100%; padding: 0.6rem 0.8rem; border: 1px solid rgba(0,0,0,0.12); border-radius: 6px; background: rgba(255,255,255,0.9); font-family: inherit; font-size: 1rem; }
+.wish-form button { margin-top: 1rem; padding: 0.7rem 1.4rem; border: none; background: currentColor; color: #fff; cursor: pointer; font-family: inherit; font-size: 0.75rem; letter-spacing: 0.25em; text-transform: uppercase; border-radius: 6px; }
+.wish-form button:disabled { opacity: 0.6; cursor: default; }
+.wish-form .ok-msg { display: none; margin-top: 0.8rem; font-style: italic; opacity: 0.8; text-align: center; }
+
+/* Registry */
+.registry-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; max-width: 880px; margin: 2rem auto 0; }
+.reg-item { display: block; padding: 1.5rem 1.2rem; background: rgba(255,255,255,0.7); border-radius: 10px; border: 1px solid rgba(0,0,0,0.06); text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s; text-align: start; }
+.reg-item:hover { transform: translateY(-4px); box-shadow: 0 10px 24px rgba(0,0,0,0.08); }
+.reg-item h3 { font-size: 1.1rem; margin-bottom: 0.4rem; }
+.reg-item p { font-size: 0.9rem; opacity: 0.75; }
+
+/* Share buttons */
+.share-row { display: flex; justify-content: center; gap: 0.8rem; flex-wrap: wrap; margin-top: 2rem; }
+.share-btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.7rem 1.3rem; border-radius: 24px; text-decoration: none; font-size: 0.75rem; letter-spacing: 0.18em; text-transform: uppercase; background: rgba(255,255,255,0.8); border: 1px solid rgba(0,0,0,0.1); color: inherit; transition: background 0.2s; }
+.share-btn:hover { background: #fff; }
+.share-btn.wa { background: #25d366; color: white; border-color: #25d366; }
+.share-btn.wa:hover { background: #1ebe5a; }
+
+/* RTL adjustments */
+[dir=rtl] .event-item .ev-link, [dir=rtl] .share-btn { letter-spacing: 0; }

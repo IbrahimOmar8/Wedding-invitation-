@@ -103,6 +103,13 @@
   .footer-names { font-family: 'Great Vibes', cursive; font-size: clamp(2.2rem, 8vw, 3rem); color: var(--gold-dark); }
   .footer-sub { font-family: 'Cinzel', serif; font-size: 0.6rem; letter-spacing: 0.35em; color: var(--ink-soft); margin-top: 0.5rem; }
 </style>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/theme-common.css">
+
+  <style>
+    html[dir=rtl] body, html[dir=rtl] .names, html[dir=rtl] h1, html[dir=rtl] h2, html[dir=rtl] h3, html[dir=rtl] .title, html[dir=rtl] .label, html[dir=rtl] .kicker, html[dir=rtl] .save-date, html[dir=rtl] .save-label, html[dir=rtl] .info-card, html[dir=rtl] .info-row, html[dir=rtl] .quote-text, html[dir=rtl] .footer-names, html[dir=rtl] .footer-sub, html[dir=rtl] .venue-line, html[dir=rtl] .u-lbl, html[dir=rtl] .num, html[dir=rtl] .btn, html[dir=rtl] .lbl, html[dir=rtl] .val, html[dir=rtl] .stamp, html[dir=rtl] .subkicker { font-family: 'Cairo', 'Amiri', sans-serif !important; letter-spacing: 0 !important; }
+    html[dir=rtl] .names { font-family: 'Amiri', 'Cairo', serif !important; font-weight: 700; }
+  </style>
 </head>
 <body>
 
@@ -111,14 +118,14 @@
 <section class="hero">
   <div class="hero-card">
     <div class="hero-frame">
-      <p class="kicker">THE WEDDING OF</p>
-      <p class="subkicker">We are getting married</p>
+      <p class="kicker">{{T_WEDDING_OF}}</p>
+      <p class="subkicker">{{T_GETTING_MARRIED}}</p>
       <h1 class="names">
         <span>{{GROOM}}</span>
         <span class="amp">&amp;</span>
         <span>{{BRIDE}}</span>
       </h1>
-      <p class="save-label">SAVE THE DATE</p>
+      <p class="save-label">{{T_SAVE_DATE}}</p>
       <div class="gold-line"></div>
       <p class="save-date">{{DATE_LONG}}</p>
     </div>
@@ -127,12 +134,12 @@
 
 <section class="block families">
   <div class="center">
-    <p class="label">An Invitation From Our Families</p>
-    <h2 class="title">Together with their families</h2>
+    <p class="label">{{T_FAMILIES_LABEL}}</p>
+    <h2 class="title">{{T_FAMILIES_TITLE}}</h2>
     <div class="divider"><span></span><i>&#9829;</i><span></span></div>
     <p class="body-text">
       <span class="names-sm">{{GROOM}} &amp; {{BRIDE}}</span>
-      invite you to share in their joy<br>as they begin their forever together
+      {{T_INVITE_TEXT}}
     </p>
     <div class="info-row">
       <span>{{WEEKDAY}} · <strong>{{DATE_LONG}}</strong></span>
@@ -141,7 +148,7 @@
     </div>
     <p class="venue-line">
       {{VENUE_NAME}}
-      <a href="{{MAP_URL}}" target="_blank" rel="noopener">VIEW LOCATION</a>
+      <a href="{{MAP_URL}}" target="_blank" rel="noopener">{{T_VIEW_LOCATION}}</a>
     </p>
     <div class="quote-card">
       <p class="q">&ldquo;{{QUOTE}}&rdquo;</p>
@@ -152,35 +159,35 @@
 
 <section class="block details">
   <div class="center">
-    <p class="label">Invitation Details</p>
-    <h2 class="title">&ldquo;We can&rsquo;t wait to celebrate<br>our love with all of you!&rdquo;</h2>
+    <p class="label">{{T_INVITATION_DETAILS}}</p>
+    <h2 class="title">&ldquo;{{T_CANT_WAIT}}&rdquo;</h2>
     <div class="divider"><span></span><i>&#9829;</i><span></span></div>
   </div>
   <div class="cards">
     <div class="card">
       <div class="icon"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/></svg></div>
-      <p class="lbl">DATE</p>
+      <p class="lbl">{{T_DATE}}</p>
       <p class="val">{{WEEKDAY}} {{DATE_LONG}}</p>
-      <a class="btn" target="_blank" href="{{CALENDAR_URL}}">ADD TO CALENDAR</a>
+      <a class="btn" target="_blank" href="{{CALENDAR_URL}}">{{T_ADD_CALENDAR}}</a>
     </div>
     <div class="card">
       <div class="icon"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg></div>
-      <p class="lbl">TIME</p>
+      <p class="lbl">{{T_TIME}}</p>
       <p class="val">{{TIME}}</p>
     </div>
     <div class="card">
       <div class="icon"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 21s-7-6.5-7-12a7 7 0 1 1 14 0c0 5.5-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></svg></div>
-      <p class="lbl">VENUE</p>
+      <p class="lbl">{{T_VENUE}}</p>
       <p class="val">{{VENUE_NAME}}<br>{{VENUE_ADDRESS}}</p>
-      <a class="btn" target="_blank" href="{{MAP_URL}}">GET DIRECTIONS</a>
+      <a class="btn" target="_blank" href="{{MAP_URL}}">{{T_GET_DIRECTIONS}}</a>
     </div>
   </div>
 </section>
 
 <section class="block gallery" id="gallery-section">
   <div class="center">
-    <p class="label">Our Memories</p>
-    <h2 class="title">Moments Together</h2>
+    <p class="label">{{T_OUR_MEMORIES}}</p>
+    <h2 class="title">{{T_MOMENTS}}</h2>
     <div class="divider"><span></span><i>&#9829;</i><span></span></div>
   </div>
   <div class="photo-grid">
@@ -190,42 +197,81 @@
 
 <section class="block count">
   <div class="center">
-    <p class="label">Counting Down</p>
-    <h2 class="title">Until We Say &ldquo;I Do&rdquo;</h2>
+    <p class="label">{{T_COUNTDOWN}}</p>
+    <h2 class="title">{{T_UNTIL_IDO}}</h2>
     <div class="divider"><span></span><i>&#9829;</i><span></span></div>
   </div>
   <div class="count-grid">
-    <div class="unit"><div class="num" id="days">00</div><p class="u-lbl">DAYS</p></div>
-    <div class="unit"><div class="num" id="hrs">00</div><p class="u-lbl">HOURS</p></div>
-    <div class="unit"><div class="num" id="mins">00</div><p class="u-lbl">MINS</p></div>
-    <div class="unit"><div class="num" id="secs">00</div><p class="u-lbl">SECS</p></div>
+    <div class="unit"><div class="num" id="days">00</div><p class="u-lbl">{{T_DAYS}}</p></div>
+    <div class="unit"><div class="num" id="hrs">00</div><p class="u-lbl">{{T_HOURS}}</p></div>
+    <div class="unit"><div class="num" id="mins">00</div><p class="u-lbl">{{T_MINS}}</p></div>
+    <div class="unit"><div class="num" id="secs">00</div><p class="u-lbl">{{T_SECS}}</p></div>
   </div>
-  <p class="final-note">WE WAIT FOR YOU WITH LOVE</p>
+  <p class="final-note">{{T_FINAL_NOTE}}</p>
 </section>
 
 <section class="block rsvp">
   <div class="center">
-    <p class="label">Kindly Reply</p>
-    <h2 class="title">Will You Join Us?</h2>
+    <p class="label">{{T_KINDLY_REPLY}}</p>
+    <h2 class="title">{{T_WILL_YOU_JOIN}}</h2>
     <div class="divider"><span></span><i>&#9829;</i><span></span></div>
   </div>
   <form class="rsvp-form" id="rsvp-form">
-    <label>Your Name</label>
+    <label>{{T_YOUR_NAME}}</label>
     <input type="text" name="guest_name" required maxlength="120">
-    <label>Email (optional)</label>
+    <label>{{T_EMAIL_OPT}}</label>
     <input type="email" name="guest_email" maxlength="200">
-    <label>Will you attend?</label>
+    <label>{{T_ATTEND_Q}}</label>
     <select name="attending" required>
-      <option value="yes">Yes, with joy</option>
-      <option value="no">Sorry, can't make it</option>
+      <option value="yes">{{T_YES_JOY}}</option>
+      <option value="no">{{T_NO_SORRY}}</option>
     </select>
-    <label>Number of Guests</label>
+    <label>{{T_NUM_GUESTS}}</label>
     <input type="number" name="guest_count" value="1" min="1" max="20">
-    <label>Message (optional)</label>
+    <label>{{T_MESSAGE_OPT}}</label>
     <textarea name="message" rows="3" maxlength="500"></textarea>
-    <button type="submit">SEND RSVP</button>
-    <div class="ok-msg" id="rsvp-ok">Thank you! Your reply has been recorded.</div>
+    <button type="submit">{{T_SEND_RSVP}}</button>
+    <div class="ok-msg" id="rsvp-ok">{{T_RSVP_OK}}</div>
   </form>
+</section>
+
+
+<!-- TC -->
+{{GUEST_GREETING}}
+
+<section class="block" id="events-section">
+  <div class="center"><p class="label">{{T_EVENTS}}</p><h2 class="title">{{T_SCHEDULE}}</h2></div>
+  <ul class="events-list">{{EVENTS_HTML}}</ul>
+</section>
+
+<section class="block" id="story-section">
+  <div class="center"><p class="label">{{T_OUR_STORY}}</p><h2 class="title">{{T_HOW_WE_MET}}</h2></div>
+  <ul class="story-list">{{STORY_HTML}}</ul>
+</section>
+
+<section class="block" id="wishes-section">
+  <div class="center"><p class="label">{{T_WISHES}}</p><h2 class="title">{{T_LEAVE_WISH}}</h2></div>
+  <div class="wishes-list" id="wishes-list">{{WISHES_HTML}}</div>
+  <form class="wish-form" id="wish-form">
+    <label>{{T_YOUR_NAME}}</label>
+    <input type="text" name="guest_name" required maxlength="120">
+    <label>{{T_YOUR_WISH}}</label>
+    <textarea name="message" rows="3" required maxlength="500"></textarea>
+    <button type="submit">{{T_SEND_WISH}}</button>
+    <div class="ok-msg" id="wish-ok">{{T_WISH_OK}}</div>
+  </form>
+</section>
+
+<section class="block" id="registry-section">
+  <div class="center"><p class="label">{{T_REGISTRY}}</p><h2 class="title">{{T_REGISTRY_NOTE}}</h2></div>
+  <div class="registry-grid">{{REGISTRY_HTML}}</div>
+</section>
+
+<section class="block">
+  <div class="share-row">
+    <a class="share-btn wa" id="share-wa" href="#" target="_blank" rel="noopener">WhatsApp</a>
+    <button class="share-btn" id="share-copy" type="button">Copy Link</button>
+  </div>
 </section>
 
 <footer>
@@ -275,5 +321,38 @@
     else { alert('Could not send RSVP. Please try again.'); }
   });
 </script>
+
+<script>
+  // Hide empty sections
+  (function(){
+    function hideIfEmpty(sel) { const el = document.querySelector(sel); if (el && !el.children.length) { const sec = el.closest('section'); if (sec) sec.style.display='none'; } }
+    hideIfEmpty('.events-list');
+    hideIfEmpty('.story-list');
+    hideIfEmpty('.registry-grid');
+    if (!document.getElementById('wishes-list').children.length) { document.getElementById('wishes-list').style.display='none'; }
+  })();
+  // Wish submit
+  const wf = document.getElementById('wish-form');
+  if (wf) wf.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const body = Object.fromEntries(new FormData(e.target).entries());
+    const r = await fetch('/api/wishes/{{SLUG}}', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+    if (r.ok) { document.getElementById('wish-ok').style.display='block'; e.target.querySelector('button').disabled = true; setTimeout(()=>location.reload(), 1200); }
+    else { alert('Could not send wish. Please try again.'); }
+  });
+  // Share buttons
+  (function(){
+    const url = window.location.href;
+    const text = document.title;
+    const wa = document.getElementById('share-wa');
+    if (wa) wa.href = 'https://wa.me/?text=' + encodeURIComponent(text + ' — ' + url);
+    const cp = document.getElementById('share-copy');
+    if (cp) cp.addEventListener('click', async () => {
+      try { await navigator.clipboard.writeText(url); cp.textContent = '✓ Copied'; setTimeout(()=>cp.textContent='Copy Link', 1500); }
+      catch (_) { prompt('Copy link:', url); }
+    });
+  })();
+</script>
+
 </body>
 </html>

@@ -68,6 +68,13 @@
   .footer-names { font-family: 'Italianno', cursive; font-size: 2.5rem; color: var(--gold-soft); }
   .footer-sub { font-family: 'Cinzel', serif; font-size: 0.6rem; letter-spacing: 0.3em; color: var(--gold); margin-top: 0.5rem; }
 </style>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/theme-common.css">
+
+  <style>
+    html[dir=rtl] body, html[dir=rtl] .names, html[dir=rtl] h1, html[dir=rtl] h2, html[dir=rtl] h3, html[dir=rtl] .title, html[dir=rtl] .label, html[dir=rtl] .kicker, html[dir=rtl] .save-date, html[dir=rtl] .save-label, html[dir=rtl] .info-card, html[dir=rtl] .info-row, html[dir=rtl] .quote-text, html[dir=rtl] .footer-names, html[dir=rtl] .footer-sub, html[dir=rtl] .venue-line, html[dir=rtl] .u-lbl, html[dir=rtl] .num, html[dir=rtl] .btn, html[dir=rtl] .lbl, html[dir=rtl] .val, html[dir=rtl] .stamp, html[dir=rtl] .subkicker { font-family: 'Cairo', 'Amiri', sans-serif !important; letter-spacing: 0 !important; }
+    html[dir=rtl] .names { font-family: 'Amiri', 'Cairo', serif !important; font-weight: 700; }
+  </style>
 </head>
 <body>
 
@@ -76,7 +83,7 @@
 <section class="hero">
   <div class="hero-inner">
     <div class="crown">&#9819;</div>
-    <p class="kicker">A ROYAL CELEBRATION</p>
+    <p class="kicker">{{T_WEDDING_OF}}</p>
     <h1 class="names">{{GROOM}}<span class="amp">&amp;</span>{{BRIDE}}</h1>
     <p class="date-band">{{DATE_LONG}} &nbsp;·&nbsp; {{TIME}}</p>
     <p class="venue">{{VENUE_NAME}}</p>
@@ -96,69 +103,108 @@
 </section>
 
 <section class="block">
-  <p class="label">CEREMONY DETAILS</p>
-  <h2 class="title">Mark Your Calendar</h2>
+  <p class="label">{{T_INVITATION_DETAILS}}</p>
+  <h2 class="title">{{T_CANT_WAIT}}</h2>
 
   <div class="info-cards">
     <div class="info-card">
       <div class="ic">&#9819;</div>
-      <h3>DATE</h3>
+      <h3>{{T_DATE}}</h3>
       <p>{{WEEKDAY}}<br>{{DATE_LONG}}</p>
-      <a href="{{CALENDAR_URL}}" target="_blank">ADD TO CALENDAR</a>
+      <a href="{{CALENDAR_URL}}" target="_blank">{{T_ADD_CALENDAR}}</a>
     </div>
     <div class="info-card">
       <div class="ic">&#9719;</div>
-      <h3>TIME</h3>
+      <h3>{{T_TIME}}</h3>
       <p>{{TIME}}</p>
     </div>
     <div class="info-card">
       <div class="ic">&#9818;</div>
-      <h3>VENUE</h3>
+      <h3>{{T_VENUE}}</h3>
       <p>{{VENUE_NAME}}<br>{{VENUE_ADDRESS}}</p>
-      <a href="{{MAP_URL}}" target="_blank">DIRECTIONS</a>
+      <a href="{{MAP_URL}}" target="_blank">{{T_GET_DIRECTIONS}}</a>
     </div>
   </div>
 </section>
 
 <section class="block" id="gallery-section">
-  <p class="label">CHERISHED MOMENTS</p>
-  <h2 class="title">Our Story In Pictures</h2>
+  <p class="label">{{T_OUR_MEMORIES}}</p>
+  <h2 class="title">{{T_MOMENTS}}</h2>
   <div class="photo-grid">
     {{GALLERY_HTML}}
   </div>
 </section>
 
 <section class="block">
-  <p class="label">THE COUNTDOWN BEGINS</p>
-  <h2 class="title">Until Our Royal Wedding</h2>
+  <p class="label">{{T_COUNTDOWN}}</p>
+  <h2 class="title">{{T_UNTIL_IDO}}</h2>
   <div class="count-grid">
-    <div class="unit"><div class="num" id="days">00</div><p class="u-lbl">DAYS</p></div>
-    <div class="unit"><div class="num" id="hrs">00</div><p class="u-lbl">HOURS</p></div>
-    <div class="unit"><div class="num" id="mins">00</div><p class="u-lbl">MINS</p></div>
-    <div class="unit"><div class="num" id="secs">00</div><p class="u-lbl">SECS</p></div>
+    <div class="unit"><div class="num" id="days">00</div><p class="u-lbl">{{T_DAYS}}</p></div>
+    <div class="unit"><div class="num" id="hrs">00</div><p class="u-lbl">{{T_HOURS}}</p></div>
+    <div class="unit"><div class="num" id="mins">00</div><p class="u-lbl">{{T_MINS}}</p></div>
+    <div class="unit"><div class="num" id="secs">00</div><p class="u-lbl">{{T_SECS}}</p></div>
   </div>
 </section>
 
 <section class="block">
-  <p class="label">KINDLY REPLY</p>
-  <h2 class="title">Will You Honor Us With Your Presence?</h2>
+  <p class="label">{{T_KINDLY_REPLY}}</p>
+  <h2 class="title">{{T_WILL_YOU_JOIN}}</h2>
   <form class="rsvp-form" id="rsvp-form">
-    <label>Your Name</label>
+    <label>{{T_YOUR_NAME}}</label>
     <input type="text" name="guest_name" required maxlength="120">
-    <label>Email (optional)</label>
+    <label>{{T_EMAIL_OPT}}</label>
     <input type="email" name="guest_email" maxlength="200">
-    <label>Will you attend?</label>
+    <label>{{T_ATTEND_Q}}</label>
     <select name="attending" required>
-      <option value="yes">Yes, with honor</option>
-      <option value="no">Sorry, can't make it</option>
+      <option value="yes">{{T_YES_JOY}}</option>
+      <option value="no">{{T_NO_SORRY}}</option>
     </select>
-    <label>Number of Guests</label>
+    <label>{{T_NUM_GUESTS}}</label>
     <input type="number" name="guest_count" value="1" min="1" max="20">
-    <label>Message (optional)</label>
+    <label>{{T_MESSAGE_OPT}}</label>
     <textarea name="message" rows="3" maxlength="500"></textarea>
-    <button type="submit">SEND RSVP</button>
-    <div class="ok-msg" id="rsvp-ok">Thank you! Your reply has been recorded.</div>
+    <button type="submit">{{T_SEND_RSVP}}</button>
+    <div class="ok-msg" id="rsvp-ok">{{T_RSVP_OK}}</div>
   </form>
+</section>
+
+
+<!-- TC -->
+{{GUEST_GREETING}}
+
+<section class="block" id="events-section">
+  <div class="center"><p class="label">{{T_EVENTS}}</p><h2 class="title">{{T_SCHEDULE}}</h2></div>
+  <ul class="events-list">{{EVENTS_HTML}}</ul>
+</section>
+
+<section class="block" id="story-section">
+  <div class="center"><p class="label">{{T_OUR_STORY}}</p><h2 class="title">{{T_HOW_WE_MET}}</h2></div>
+  <ul class="story-list">{{STORY_HTML}}</ul>
+</section>
+
+<section class="block" id="wishes-section">
+  <div class="center"><p class="label">{{T_WISHES}}</p><h2 class="title">{{T_LEAVE_WISH}}</h2></div>
+  <div class="wishes-list" id="wishes-list">{{WISHES_HTML}}</div>
+  <form class="wish-form" id="wish-form">
+    <label>{{T_YOUR_NAME}}</label>
+    <input type="text" name="guest_name" required maxlength="120">
+    <label>{{T_YOUR_WISH}}</label>
+    <textarea name="message" rows="3" required maxlength="500"></textarea>
+    <button type="submit">{{T_SEND_WISH}}</button>
+    <div class="ok-msg" id="wish-ok">{{T_WISH_OK}}</div>
+  </form>
+</section>
+
+<section class="block" id="registry-section">
+  <div class="center"><p class="label">{{T_REGISTRY}}</p><h2 class="title">{{T_REGISTRY_NOTE}}</h2></div>
+  <div class="registry-grid">{{REGISTRY_HTML}}</div>
+</section>
+
+<section class="block">
+  <div class="share-row">
+    <a class="share-btn wa" id="share-wa" href="#" target="_blank" rel="noopener">WhatsApp</a>
+    <button class="share-btn" id="share-copy" type="button">Copy Link</button>
+  </div>
 </section>
 
 <footer>
@@ -204,5 +250,38 @@
     else { alert('Could not send RSVP. Please try again.'); }
   });
 </script>
+
+<script>
+  // Hide empty sections
+  (function(){
+    function hideIfEmpty(sel) { const el = document.querySelector(sel); if (el && !el.children.length) { const sec = el.closest('section'); if (sec) sec.style.display='none'; } }
+    hideIfEmpty('.events-list');
+    hideIfEmpty('.story-list');
+    hideIfEmpty('.registry-grid');
+    if (!document.getElementById('wishes-list').children.length) { document.getElementById('wishes-list').style.display='none'; }
+  })();
+  // Wish submit
+  const wf = document.getElementById('wish-form');
+  if (wf) wf.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const body = Object.fromEntries(new FormData(e.target).entries());
+    const r = await fetch('/api/wishes/{{SLUG}}', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+    if (r.ok) { document.getElementById('wish-ok').style.display='block'; e.target.querySelector('button').disabled = true; setTimeout(()=>location.reload(), 1200); }
+    else { alert('Could not send wish. Please try again.'); }
+  });
+  // Share buttons
+  (function(){
+    const url = window.location.href;
+    const text = document.title;
+    const wa = document.getElementById('share-wa');
+    if (wa) wa.href = 'https://wa.me/?text=' + encodeURIComponent(text + ' — ' + url);
+    const cp = document.getElementById('share-copy');
+    if (cp) cp.addEventListener('click', async () => {
+      try { await navigator.clipboard.writeText(url); cp.textContent = '✓ Copied'; setTimeout(()=>cp.textContent='Copy Link', 1500); }
+      catch (_) { prompt('Copy link:', url); }
+    });
+  })();
+</script>
+
 </body>
 </html>
