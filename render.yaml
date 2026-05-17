@@ -1,0 +1,54 @@
+services:
+  - type: web
+    name: wedcard
+    env: node
+    region: frankfurt
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: TRUST_PROXY
+        value: 1
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ENCRYPT_KEY
+        generateValue: true
+      - key: PUBLIC_URL
+        sync: false
+      - key: WISHLISTY_BASE_URL
+        value: https://wish-listy-backend.onrender.com
+      - key: ALLOWED_ORIGINS
+        sync: false
+      # Optional integrations (set via dashboard if you want them on)
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        sync: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: MAIL_FROM
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: FIREBASE_PROJECT_ID
+        sync: false
+      - key: FIREBASE_CLIENT_EMAIL
+        sync: false
+      - key: FIREBASE_PRIVATE_KEY
+        sync: false
+    disk:
+      name: wedcard-data
+      mountPath: /opt/render/project/src/data
+      sizeGB: 1

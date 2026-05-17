@@ -29,6 +29,7 @@
     <button class="nav-item" data-section="wishes"><span class="ic">&#128173;</span>Wishes</button>
     <button class="nav-item" data-section="gifts"><span class="ic">&#127873;</span>Gift Tracking</button>
     <button class="nav-item" data-section="cohosts"><span class="ic">&#128107;</span>Co-hosts</button>
+    <button class="nav-item" data-section="music"><span class="ic">&#127925;</span>Songs</button>
     <button class="nav-item" data-section="analytics"><span class="ic">&#128202;</span>Analytics</button>
     <button class="nav-item" data-section="settings"><span class="ic">&#9881;</span>Settings</button>
     <div class="nav-spacer"></div>
@@ -236,6 +237,13 @@
           </div>
 
           <div class="card">
+            <h2>Import from Wish Listy</h2>
+            <p class="desc">Add all your Wish Listy friends as guests in one click.</p>
+            <button class="btn secondary" id="import-friends">Load friends</button>
+            <div id="friends-preview" style="margin-top:1rem"></div>
+          </div>
+
+          <div class="card">
             <h2>Master QR Code</h2>
             <p class="desc">Print this QR on your physical invitations — it opens your main invitation page.</p>
             <div class="qr-preview" id="qr-main"></div>
@@ -296,6 +304,15 @@
             <h2>Invitations you co-host</h2>
             <div id="cohost-of-list"></div>
           </div>
+        </section>
+
+        <!-- MUSIC REQUESTS -->
+        <section class="section" id="section-music">
+          <div class="page-header">
+            <div><h1>Song Requests</h1><p>Songs your guests want to hear at the party.</p></div>
+            <a href="/api/music/export" class="btn secondary" id="export-music">Export CSV</a>
+          </div>
+          <div id="music-list"></div>
         </section>
 
         <!-- ANALYTICS -->

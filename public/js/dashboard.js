@@ -73,6 +73,7 @@ document.querySelectorAll('.nav-item[data-section]').forEach(btn => {
     if (id === 'gifts') loadGifts();
     if (id === 'cohosts') loadCohosts();
     if (id === 'analytics') loadAnalytics();
+    if (id === 'music') loadMusic();
     document.getElementById('sidebar').classList.remove('open');
     document.getElementById('sidebar-backdrop').classList.remove('open');
   });
@@ -319,6 +320,80 @@ async function loadAnalytics() {
       : '<p class="desc">No views yet.</p>';
   } catch (ex) { toast(ex.message, 'error'); }
 }
+
+// ─── Music requests ───
+async function loadMusic() {
+  const list = document.getElementById('music-list');
+  list.innerHTML = '<p class="desc">Loading…</p>';
+  try {
+    const { requests } = await api('/api/music');
+    if (!requests.length) { list.innerHTML = '<div class="empty-state"><div class="ic">&#127925;</div><p>No song requests yet.</p></div>'; return; }
+    list.innerHTML = requests.map(r => `
+      <div class="item-row" data-id="${r.id}">
+        <div class="ir-body">
+          <h3>${escapeHtml(r.song)}${r.artist ? ' <span style="opacity:0.6">— ' + escapeHtml(r.artist) + '</span>' : ''}</h3>
+          <div class="meta">Requested by ${escapeHtml(r.guest_name)} · ${formatWhen(r.created_at)}</div>
+          ${r.note ? `<p>${escapeHtml(r.note)}</p>` : ''}
+        </div>
+        <div class="ir-actions">
+          <button data-played="${r.id}" data-on="${r.played}">${r.played ? '✓ Played' : 'Mark played'}</button>
+          <button data-hide="${r.id}" data-on="${r.approved}">${r.approved ? 'Hide' : 'Show'}</button>
+          <button class="del" data-id="${r.id}">Delete</button>
+        </div>
+      </div>`).join('');
+    list.querySelectorAll('[data-played]').forEach(b => b.addEventListener('click', async () => {
+      await api('/api/music/' + b.dataset.played, { method: 'PUT', body: JSON.stringify({ played: b.dataset.on === '1' ? 0 : 1 }) });
+      loadMusic();
+    }));
+    list.querySelectorAll('[data-hide]').forEach(b => b.addEventListener('click', async () => {
+      await api('/api/music/' + b.dataset.hide, { method: 'PUT', body: JSON.stringify({ approved: b.dataset.on === '1' ? 0 : 1 }) });
+      loadMusic();
+    }));
+    list.querySelectorAll('.del').forEach(b => b.addEventListener('click', async () => {
+      if (!confirm('Delete this request?')) return;
+      await api('/api/music/' + b.dataset.id, { method: 'DELETE' });
+      loadMusic();
+    }));
+  } catch (ex) { list.innerHTML = `<p class="desc" style="color:var(--error)">${escapeHtml(ex.message)}</p>`; }
+}
+
+document.getElementById('export-music')?.addEventListener('click', async (e) => {
+  e.preventDefault();
+  const r = await fetch('/api/music/export', { headers: { 'Authorization': 'Bearer ' + token } });
+  if (!r.ok) return toast('Export failed', 'error');
+  const blob = await r.blob();
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = 'songs.csv'; a.click();
+});
+
+// ─── Friends import ───
+document.getElementById('import-friends')?.addEventListener('click', async (e) => {
+  e.target.disabled = true;
+  const box = document.getElementById('friends-preview');
+  box.innerHTML = '<p class="desc">Loading friends from Wish Listy…</p>';
+  try {
+    const { friends } = await api('/api/friends');
+    if (!friends.length) { box.innerHTML = '<p class="desc">No friends found in Wish Listy.</p>'; return; }
+    box.innerHTML = `
+      <p class="desc">${friends.length} friend${friends.length>1?'s':''} found. Import all as guests?</p>
+      <ul style="margin:0.5rem 0;padding-left:1.2rem">
+        ${friends.slice(0, 10).map(f => `<li>${escapeHtml(f.fullName || f.name || f.username || 'Unknown')}</li>`).join('')}
+        ${friends.length > 10 ? `<li>…and ${friends.length - 10} more</li>` : ''}
+      </ul>
+      <button class="btn" id="do-import-friends">Import as guests</button>
+    `;
+    document.getElementById('do-import-friends').addEventListener('click', async (e) => {
+      e.target.disabled = true;
+      try {
+        const r = await api('/api/friends/import', { method: 'POST', body: JSON.stringify({ friends }) });
+        toast(`${r.added} friends added as guests`);
+        box.innerHTML = '';
+        loadGuests();
+      } catch (ex) { toast(ex.message, 'error'); }
+    });
+  } catch (ex) { box.innerHTML = `<p class="desc" style="color:var(--error)">${escapeHtml(ex.message)}</p>`; }
+  finally { e.target.disabled = false; }
+});
 
 // ─── Push notifications (browser permission + FCM token) ───
 document.getElementById('enable-push')?.addEventListener('click', async () => {
