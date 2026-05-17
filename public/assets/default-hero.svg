@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 530 746" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fffaf0"/>
+      <stop offset="100%" stop-color="#f2ebdd"/>
+    </linearGradient>
+    <linearGradient id="arch" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#d6b66a" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#b78a3a" stop-opacity="0.15"/>
+    </linearGradient>
+  </defs>
+  <rect width="530" height="746" fill="url(#bg)"/>
+  <path d="M 130 200 Q 130 100 265 100 Q 400 100 400 200 L 400 700 L 130 700 Z" fill="url(#arch)"/>
+  <path d="M 130 200 Q 130 100 265 100 Q 400 100 400 200 L 400 700 L 130 700 Z" fill="none" stroke="#b78a3a" stroke-width="2" stroke-opacity="0.6"/>
+  <g opacity="0.4">
+    <circle cx="265" cy="350" r="80" fill="none" stroke="#b78a3a" stroke-width="1.5"/>
+    <circle cx="265" cy="350" r="50" fill="none" stroke="#b78a3a" stroke-width="1"/>
+    <text x="265" y="365" text-anchor="middle" font-family="serif" font-size="40" fill="#8a6620" font-style="italic">&amp;</text>
+  </g>
+</svg>

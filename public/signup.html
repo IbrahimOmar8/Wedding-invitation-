@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign Up — WedCard</title>
+<link rel="stylesheet" href="/css/auth.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant+Garamond:wght@400;500&family=Cinzel:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="auth-card">
+  <a href="/" class="brand">WedCard</a>
+  <p class="tagline">Create Your Wedding Invitation</p>
+  <h1>Create your account</h1>
+
+  <div class="error-box" id="err"></div>
+
+  <form id="signup-form" autocomplete="off">
+    <div class="field">
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" required autocomplete="email">
+    </div>
+
+    <div class="field">
+      <label for="slug">Your Invitation Link</label>
+      <input type="text" id="slug" name="slug" required pattern="[a-z0-9-]+" minlength="3" maxlength="40" placeholder="e.g. ibrahim-omnia">
+      <p class="hint" id="slug-hint">Your invitation will be at <code>/i/your-slug</code></p>
+    </div>
+
+    <div class="field">
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" required minlength="6" autocomplete="new-password">
+      <p class="hint">At least 6 characters</p>
+    </div>
+
+    <button type="submit" class="btn" id="submit-btn">Create Account</button>
+  </form>
+
+  <p class="alt-link">Already have an account? <a href="/login">Sign in</a></p>
+</div>
+
+<script>
+  const slugInput = document.getElementById('slug');
+  const slugHint = document.getElementById('slug-hint');
+  let slugTimer;
+
+  slugInput.addEventListener('input', () => {
+    const val = slugInput.value.toLowerCase().replace(/[^a-z0-9-]/g, '');
+    if (slugInput.value !== val) slugInput.value = val;
+    clearTimeout(slugTimer);
+    if (val.length < 3) { slugHint.className = 'hint'; slugHint.innerHTML = 'Your invitation will be at <code>/i/your-slug</code>'; return; }
+    slugTimer = setTimeout(async () => {
+      const r = await fetch('/api/auth/check-slug/' + val);
+      const data = await r.json();
+      if (data.available) { slugHint.className = 'hint ok'; slugHint.innerHTML = `✓ <code>/i/${data.slug}</code> is available`; }
+      else { slugHint.className = 'hint error'; slugHint.innerHTML = `✗ <code>/i/${data.slug}</code> is taken or invalid`; }
+    }, 350);
+  });
+
+  document.getElementById('signup-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('submit-btn');
+    const err = document.getElementById('err');
+    err.classList.remove('show');
+    btn.disabled = true; btn.textContent = 'Creating...';
+
+    const body = {
+      email: document.getElementById('email').value,
+      slug: document.getElementById('slug').value,
+      password: document.getElementById('password').value,
+    };
+    try {
+      const r = await fetch('/api/auth/signup', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.error || 'Sign up failed');
+      localStorage.setItem('wc_token', data.token);
+      localStorage.setItem('wc_user', JSON.stringify(data.user));
+      window.location.href = '/dashboard';
+    } catch (ex) {
+      err.textContent = ex.message;
+      err.classList.add('show');
+      btn.disabled = false; btn.textContent = 'Create Account';
+    }
+  });
+</script>
+</body>
+</html>
