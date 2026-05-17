@@ -1,0 +1,33 @@
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --gold: #b78a3a; --gold-d: #8a6620; --gold-l: #d6b66a;
+  --cream: #faf6ef; --cream-2: #f2ebdd;
+  --ink: #2d2a24; --ink-soft: #6b6354;
+  --white: #fff; --error: #c84a4a; --error-bg: #fde8e8;
+}
+body { background: var(--cream); color: var(--ink); font-family: 'Cormorant Garamond', Georgia, serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem 1rem; }
+
+.auth-card { background: var(--white); padding: 3rem 2.5rem; border-radius: 12px; box-shadow: 0 30px 60px rgba(120,90,30,0.15); max-width: 440px; width: 100%; }
+.brand { display: block; text-align: center; font-family: 'Great Vibes', cursive; font-size: 2.4rem; color: var(--gold-d); text-decoration: none; margin-bottom: 0.4rem; }
+.tagline { text-align: center; color: var(--ink-soft); font-family: 'Cinzel', serif; font-size: 0.7rem; letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 2rem; }
+.auth-card h1 { text-align: center; font-size: 1.6rem; color: var(--ink); margin-bottom: 1.8rem; font-weight: 400; font-style: italic; }
+
+.field { margin-bottom: 1.2rem; }
+.field label { display: block; font-family: 'Cinzel', serif; font-size: 0.65rem; letter-spacing: 0.25em; color: var(--gold-d); margin-bottom: 0.4rem; text-transform: uppercase; }
+.field input { width: 100%; padding: 0.8rem 0.9rem; border: 1px solid var(--cream-2); border-radius: 6px; background: var(--cream); font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.05rem; color: var(--ink); transition: border-color 0.2s, background 0.2s; }
+.field input:focus { outline: none; border-color: var(--gold); background: var(--white); }
+.field .hint { font-size: 0.85rem; color: var(--ink-soft); margin-top: 0.3rem; font-style: italic; }
+.field .hint code { background: var(--cream); padding: 1px 5px; border-radius: 3px; color: var(--gold-d); }
+.field .hint.error { color: var(--error); }
+.field .hint.ok { color: #2d6e3f; }
+
+.btn { width: 100%; padding: 0.9rem; background: var(--gold); color: var(--white); border: none; border-radius: 6px; font-family: 'Cinzel', serif; font-size: 0.8rem; letter-spacing: 0.25em; text-transform: uppercase; cursor: pointer; transition: background 0.2s; margin-top: 0.5rem; }
+.btn:hover { background: var(--gold-d); }
+.btn:disabled { background: var(--cream-2); color: var(--ink-soft); cursor: not-allowed; }
+
+.alt-link { text-align: center; margin-top: 1.5rem; color: var(--ink-soft); }
+.alt-link a { color: var(--gold-d); text-decoration: none; border-bottom: 1px solid var(--gold-l); }
+.alt-link a:hover { color: var(--gold); }
+
+.error-box { display: none; padding: 0.8rem; background: var(--error-bg); color: var(--error); border-radius: 6px; margin-bottom: 1.2rem; text-align: center; }
+.error-box.show { display: block; }

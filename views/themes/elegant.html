@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="{{LANG}}" dir="{{DIR}}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{GROOM}} &amp; {{BRIDE}} — {{DATE_LONG}}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Cinzel:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --gold: #b78a3a; --gold-dark: #8a6620; --gold-soft: #d6b66a;
+    --gold-line: rgba(183,138,58,0.35);
+    --cream: #faf6ef; --cream-2: #f2ebdd;
+    --ink: #2d2a24; --ink-soft: #6b6354; --white: #ffffff;
+  }
+  html { scroll-behavior: smooth; }
+  body { background: var(--cream); color: var(--ink); font-family: 'Cormorant Garamond', serif; font-weight: 400; overflow-x: hidden; line-height: 1.55; }
+
+  .petals { position: fixed; inset: 0; pointer-events: none; z-index: 1; overflow: hidden; }
+  .petals span { position: absolute; top: -10%; width: 10px; height: 10px; background: radial-gradient(circle at 30% 30%, #f8d7d9, #c9a2a6); border-radius: 65% 35% 55% 45% / 60% 55% 45% 40%; opacity: 0.55; animation: fall var(--dur,14s) var(--delay,0s) linear infinite; filter: blur(0.3px); }
+  .petals span:nth-child(odd) { background: radial-gradient(circle at 30% 30%, #fbefc6, var(--gold-soft)); border-radius: 50%; width: 6px; height: 6px; opacity: 0.7; }
+  @keyframes fall { 0%{transform:translate(0,-10vh) rotate(0);opacity:0;} 10%{opacity:0.7;} 100%{transform:translate(var(--drift,40px),110vh) rotate(360deg);opacity:0;} }
+
+  .hero { position: relative; min-height: 100svh; display: flex; align-items: center; justify-content: center; text-align: center; overflow: hidden; padding: 2rem 1rem; background: linear-gradient(180deg, #fffaf0 0%, #faf6ef 100%); }
+  .hero-card { position: relative; width: 100%; max-width: 560px; aspect-ratio: 530/746; margin: 0 auto; box-shadow: 0 20px 60px rgba(120,90,30,0.18); animation: frameIn 1.3s ease both; overflow: hidden; background: #fff; }
+  .hero-card::before { content: ""; position: absolute; inset: 0; background-image: url('{{HERO_IMAGE}}'); background-size: cover; background-position: center; z-index: 0; animation: kenburns 22s ease-in-out infinite alternate; }
+  @keyframes kenburns { 0%{transform:scale(1);} 100%{transform:scale(1.06);} }
+  @keyframes frameIn { from{opacity:0;transform:translateY(30px) scale(0.96);} to{opacity:1;transform:none;} }
+
+  .hero-frame { position: absolute; z-index: 2; top: 23%; left: 50%; transform: translateX(-50%); width: calc(100% - 2.5rem); max-width: 360px; padding: 0 0.8rem; text-align: center; animation: frameIn 1.4s 0.25s ease both; }
+  .hero-frame::before { content: ""; position: absolute; inset: -8% -10%; background: radial-gradient(ellipse at center, rgba(255,250,240,0.85) 0%, rgba(255,250,240,0.5) 45%, rgba(255,250,240,0) 75%); z-index: -1; }
+
+  .kicker { font-family: 'Cinzel', serif; font-size: 0.75rem; letter-spacing: 0.4em; color: var(--gold-dark); }
+  .subkicker { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1rem; color: var(--ink-soft); margin-top: 0.4rem; }
+  .names { font-family: 'Great Vibes', cursive; font-size: clamp(2.2rem, 7vw, 3.4rem); color: var(--ink); line-height: 1; margin: 0.8rem 0 0.2rem; }
+  .amp { display: block; font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.4rem; color: var(--gold); }
+  .save-label { font-family: 'Cinzel', serif; font-size: 0.65rem; letter-spacing: 0.35em; color: var(--gold-dark); margin-top: 1.2rem; }
+  .gold-line { width: 220px; max-width: 70%; height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent); margin: 0.8rem auto; }
+  .save-date { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; letter-spacing: 0.2em; color: var(--ink); }
+  .kicker, .subkicker, .save-label, .save-date, .names, .amp { text-shadow: 0 0 18px rgba(255,250,240,0.95), 0 0 8px rgba(255,250,240,0.9), 0 1px 2px rgba(255,255,255,0.9); }
+
+  section.block { padding: clamp(3.5rem, 9vw, 6rem) clamp(1rem, 5vw, 2.5rem); position: relative; z-index: 2; }
+  .center { text-align: center; max-width: 620px; margin: 0 auto; }
+  .label { font-family: 'Cinzel', serif; font-size: 0.7rem; letter-spacing: 0.4em; color: var(--gold-dark); text-transform: uppercase; }
+  .title { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: clamp(1.6rem, 5vw, 2.4rem); color: var(--ink); margin: 0.8rem 0 1rem; }
+  .divider { display: flex; align-items: center; gap: 0.8rem; max-width: 280px; margin: 1rem auto 2rem; }
+  .divider span { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--gold-line), transparent); }
+  .divider i { color: var(--gold); font-style: normal; font-size: 0.9rem; animation: heartbeat 1.6s ease-in-out infinite; }
+  @keyframes heartbeat { 0%,100%{transform:scale(1);} 25%{transform:scale(1.25);} 50%{transform:scale(0.95);} 75%{transform:scale(1.15);} }
+
+  .families { background: linear-gradient(180deg, var(--cream) 0%, var(--cream-2) 100%); text-align: center; }
+  .families .body-text { font-size: clamp(1.05rem, 2.8vw, 1.2rem); color: var(--ink-soft); font-style: italic; margin: 0 auto; max-width: 520px; }
+  .families .names-sm { font-family: 'Great Vibes', cursive; font-size: clamp(2.4rem, 8vw, 3.4rem); color: var(--gold-dark); line-height: 1; display: block; margin: 0.8rem 0; }
+  .families .info-row { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-top: 1.8rem; font-family: 'Cinzel', serif; font-size: 0.8rem; letter-spacing: 0.18em; color: var(--gold-dark); }
+  .families .info-row strong { color: var(--ink); font-weight: 500; }
+
+  .venue-line { margin-top: 1.2rem; font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; color: var(--ink); }
+  .venue-line a { color: var(--gold-dark); text-decoration: none; border-bottom: 1px solid var(--gold); padding-bottom: 1px; margin-left: 0.4rem; font-family: 'Cinzel', serif; font-size: 0.68rem; letter-spacing: 0.2em; }
+  .quote-card { margin-top: 3rem; padding: 2.2rem 1.5rem; border-top: 1px solid var(--gold-line); border-bottom: 1px solid var(--gold-line); background: rgba(255,255,255,0.5); }
+  .quote-card .q { font-family: 'Great Vibes', cursive; font-size: clamp(1.8rem, 6vw, 2.6rem); color: var(--gold-dark); line-height: 1.4; }
+  .quote-card .presence { margin-top: 1rem; font-style: italic; color: var(--ink-soft); }
+
+  .details { background: var(--cream); }
+  .cards { max-width: 520px; margin: 0 auto; display: flex; flex-direction: column; gap: 1rem; }
+  .card { border: 1px solid var(--gold-line); background: var(--white); padding: 2rem 1.5rem; text-align: center; position: relative; transition: transform 0.4s, box-shadow 0.4s, border-color 0.4s; }
+  .card::before, .card::after { content: ""; position: absolute; width: 24px; height: 24px; border: 1px solid var(--gold); }
+  .card::before { top: 6px; left: 6px; border-right: 0; border-bottom: 0; }
+  .card::after { bottom: 6px; right: 6px; border-left: 0; border-top: 0; }
+  .card:hover { transform: translateY(-4px); box-shadow: 0 18px 36px rgba(120,90,30,0.12); border-color: var(--gold); }
+  .card .icon { width: 54px; height: 54px; border: 1px solid var(--gold-line); border-radius: 50%; display: grid; place-items: center; margin: 0 auto 1rem; color: var(--gold-dark); background: var(--cream); }
+  .card .lbl { font-family: 'Cinzel', serif; font-size: 0.65rem; letter-spacing: 0.4em; color: var(--gold-dark); margin-bottom: 0.7rem; }
+  .card .val { font-family: 'Cormorant Garamond', serif; font-size: 1.35rem; color: var(--ink); line-height: 1.4; }
+  .card .btn { display: inline-flex; align-items: center; gap: 0.5rem; margin-top: 1rem; padding: 0.6rem 1.4rem; border: 1px solid var(--gold); color: var(--gold-dark); text-decoration: none; font-family: 'Cinzel', serif; font-size: 0.65rem; letter-spacing: 0.3em; background: transparent; transition: all 0.3s; cursor: pointer; }
+  .card .btn:hover { background: var(--gold); color: var(--white); }
+
+  .gallery { background: var(--cream-2); }
+  .photo-grid { max-width: 900px; margin: 2rem auto 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.8rem; }
+  .photo { aspect-ratio: 3/4; overflow: hidden; position: relative; border: 1px solid var(--gold-line); box-shadow: 0 6px 18px rgba(120,90,30,0.08); background: var(--cream); }
+  .photo.wide { aspect-ratio: 4/3; grid-column: span 2; }
+  .photo img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.9s ease; display: block; }
+  .photo:hover img { transform: scale(1.07); }
+  @media (max-width: 520px) { .photo.wide { grid-column: span 1; aspect-ratio: 3/4; } }
+
+  .count { background: var(--cream); text-align: center; }
+  .count-grid { display: flex; justify-content: center; gap: clamp(0.4rem, 2vw, 1.2rem); flex-wrap: wrap; margin-top: 2rem; }
+  .unit { min-width: clamp(70px, 20vw, 110px); padding: 1.2rem 0.8rem 1rem; background: var(--white); border: 1px solid var(--gold-line); }
+  .num { font-family: 'Cormorant Garamond', serif; font-size: clamp(2rem, 7vw, 3rem); color: var(--gold-dark); font-weight: 500; line-height: 1; }
+  .u-lbl { font-family: 'Cinzel', serif; font-size: 0.55rem; letter-spacing: 0.3em; color: var(--ink-soft); margin-top: 0.6rem; }
+  .final-note { font-family: 'Cinzel', serif; font-size: 0.7rem; letter-spacing: 0.35em; color: var(--gold-dark); margin-top: 2.5rem; }
+
+  /* RSVP */
+  .rsvp { background: var(--cream-2); }
+  .rsvp-form { max-width: 480px; margin: 2rem auto 0; background: var(--white); padding: 2rem 1.5rem; border: 1px solid var(--gold-line); }
+  .rsvp-form label { display: block; font-family: 'Cinzel', serif; font-size: 0.6rem; letter-spacing: 0.3em; color: var(--gold-dark); margin: 1rem 0 0.4rem; }
+  .rsvp-form input, .rsvp-form select, .rsvp-form textarea { width: 100%; padding: 0.7rem; border: 1px solid var(--gold-line); background: var(--cream); font-family: 'Cormorant Garamond', serif; font-size: 1rem; color: var(--ink); }
+  .rsvp-form button { margin-top: 1.5rem; width: 100%; padding: 0.9rem; background: var(--gold); color: var(--white); border: none; font-family: 'Cinzel', serif; letter-spacing: 0.3em; font-size: 0.7rem; cursor: pointer; transition: background 0.3s; }
+  .rsvp-form button:hover { background: var(--gold-dark); }
+  .rsvp-form .ok-msg { display: none; margin-top: 1rem; padding: 0.8rem; background: #e8f3ea; color: #2d6e3f; text-align: center; font-style: italic; }
+
+  footer { padding: 2.5rem 1rem 3.5rem; text-align: center; background: var(--cream-2); border-top: 1px solid var(--gold-line); position: relative; z-index: 2; }
+  .footer-names { font-family: 'Great Vibes', cursive; font-size: clamp(2.2rem, 8vw, 3rem); color: var(--gold-dark); }
+  .footer-sub { font-family: 'Cinzel', serif; font-size: 0.6rem; letter-spacing: 0.35em; color: var(--ink-soft); margin-top: 0.5rem; }
+</style>
+</head>
+<body>
+
+<div class="petals" aria-hidden="true"></div>
+
+<section class="hero">
+  <div class="hero-card">
+    <div class="hero-frame">
+      <p class="kicker">THE WEDDING OF</p>
+      <p class="subkicker">We are getting married</p>
+      <h1 class="names">
+        <span>{{GROOM}}</span>
+        <span class="amp">&amp;</span>
+        <span>{{BRIDE}}</span>
+      </h1>
+      <p class="save-label">SAVE THE DATE</p>
+      <div class="gold-line"></div>
+      <p class="save-date">{{DATE_LONG}}</p>
+    </div>
+  </div>
+</section>
+
+<section class="block families">
+  <div class="center">
+    <p class="label">An Invitation From Our Families</p>
+    <h2 class="title">Together with their families</h2>
+    <div class="divider"><span></span><i>&#9829;</i><span></span></div>
+    <p class="body-text">
+      <span class="names-sm">{{GROOM}} &amp; {{BRIDE}}</span>
+      invite you to share in their joy<br>as they begin their forever together
+    </p>
+    <div class="info-row">
+      <span>{{WEEKDAY}} · <strong>{{DATE_LONG}}</strong></span>
+      <span>·</span>
+      <span><strong>{{TIME}}</strong></span>
+    </div>
+    <p class="venue-line">
+      {{VENUE_NAME}}
+      <a href="{{MAP_URL}}" target="_blank" rel="noopener">VIEW LOCATION</a>
+    </p>
+    <div class="quote-card">
+      <p class="q">&ldquo;{{QUOTE}}&rdquo;</p>
+      <p class="presence">{{PRESENCE}}</p>
+    </div>
+  </div>
+</section>
+
+<section class="block details">
+  <div class="center">
+    <p class="label">Invitation Details</p>
+    <h2 class="title">&ldquo;We can&rsquo;t wait to celebrate<br>our love with all of you!&rdquo;</h2>
+    <div class="divider"><span></span><i>&#9829;</i><span></span></div>
+  </div>
+  <div class="cards">
+    <div class="card">
+      <div class="icon"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/></svg></div>
+      <p class="lbl">DATE</p>
+      <p class="val">{{WEEKDAY}} {{DATE_LONG}}</p>
+      <a class="btn" target="_blank" href="{{CALENDAR_URL}}">ADD TO CALENDAR</a>
+    </div>
+    <div class="card">
+      <div class="icon"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg></div>
+      <p class="lbl">TIME</p>
+      <p class="val">{{TIME}}</p>
+    </div>
+    <div class="card">
+      <div class="icon"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 21s-7-6.5-7-12a7 7 0 1 1 14 0c0 5.5-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></svg></div>
+      <p class="lbl">VENUE</p>
+      <p class="val">{{VENUE_NAME}}<br>{{VENUE_ADDRESS}}</p>
+      <a class="btn" target="_blank" href="{{MAP_URL}}">GET DIRECTIONS</a>
+    </div>
+  </div>
+</section>
+
+<section class="block gallery" id="gallery-section">
+  <div class="center">
+    <p class="label">Our Memories</p>
+    <h2 class="title">Moments Together</h2>
+    <div class="divider"><span></span><i>&#9829;</i><span></span></div>
+  </div>
+  <div class="photo-grid">
+    {{GALLERY_HTML}}
+  </div>
+</section>
+
+<section class="block count">
+  <div class="center">
+    <p class="label">Counting Down</p>
+    <h2 class="title">Until We Say &ldquo;I Do&rdquo;</h2>
+    <div class="divider"><span></span><i>&#9829;</i><span></span></div>
+  </div>
+  <div class="count-grid">
+    <div class="unit"><div class="num" id="days">00</div><p class="u-lbl">DAYS</p></div>
+    <div class="unit"><div class="num" id="hrs">00</div><p class="u-lbl">HOURS</p></div>
+    <div class="unit"><div class="num" id="mins">00</div><p class="u-lbl">MINS</p></div>
+    <div class="unit"><div class="num" id="secs">00</div><p class="u-lbl">SECS</p></div>
+  </div>
+  <p class="final-note">WE WAIT FOR YOU WITH LOVE</p>
+</section>
+
+<section class="block rsvp">
+  <div class="center">
+    <p class="label">Kindly Reply</p>
+    <h2 class="title">Will You Join Us?</h2>
+    <div class="divider"><span></span><i>&#9829;</i><span></span></div>
+  </div>
+  <form class="rsvp-form" id="rsvp-form">
+    <label>Your Name</label>
+    <input type="text" name="guest_name" required maxlength="120">
+    <label>Email (optional)</label>
+    <input type="email" name="guest_email" maxlength="200">
+    <label>Will you attend?</label>
+    <select name="attending" required>
+      <option value="yes">Yes, with joy</option>
+      <option value="no">Sorry, can't make it</option>
+    </select>
+    <label>Number of Guests</label>
+    <input type="number" name="guest_count" value="1" min="1" max="20">
+    <label>Message (optional)</label>
+    <textarea name="message" rows="3" maxlength="500"></textarea>
+    <button type="submit">SEND RSVP</button>
+    <div class="ok-msg" id="rsvp-ok">Thank you! Your reply has been recorded.</div>
+  </form>
+</section>
+
+<footer>
+  <p class="footer-names">{{GROOM}} &amp; {{BRIDE}}</p>
+  <p class="footer-sub">{{DATE_LONG}} &nbsp;·&nbsp; {{VENUE_NAME}}</p>
+</footer>
+
+<script>
+  (function(){
+    const box = document.querySelector('.petals');
+    for (let i = 0; i < 24; i++) {
+      const p = document.createElement('span');
+      p.style.cssText = `left:${Math.random()*100}%;--dur:${10+Math.random()*10}s;--delay:${-Math.random()*12}s;--drift:${(Math.random()*120-60)}px;transform:scale(${0.6+Math.random()*0.9});`;
+      box.appendChild(p);
+    }
+  })();
+
+  const pad = n => String(n).padStart(2,'0');
+  function setNum(id, v){ document.getElementById(id).textContent = pad(v); }
+  (function tick(){
+    const target = new Date('{{WEDDING_ISO}}').getTime();
+    let diff = Math.max(0, target - Date.now());
+    const d = Math.floor(diff/86400000); diff %= 86400000;
+    const h = Math.floor(diff/3600000);  diff %= 3600000;
+    const m = Math.floor(diff/60000);    diff %= 60000;
+    const s = Math.floor(diff/1000);
+    setNum('days', d); setNum('hrs', h); setNum('mins', m); setNum('secs', s);
+    setTimeout(tick, 1000);
+  })();
+
+  // Hide gallery section if empty
+  (function(){
+    const grid = document.querySelector('.photo-grid');
+    if (!grid || !grid.children.length) {
+      const sec = document.getElementById('gallery-section');
+      if (sec) sec.style.display = 'none';
+    }
+  })();
+
+  // RSVP submit
+  document.getElementById('rsvp-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const body = Object.fromEntries(fd.entries());
+    const r = await fetch('/api/rsvp/{{SLUG}}', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
+    if (r.ok) { document.getElementById('rsvp-ok').style.display = 'block'; e.target.querySelector('button').disabled = true; }
+    else { alert('Could not send RSVP. Please try again.'); }
+  });
+</script>
+</body>
+</html>

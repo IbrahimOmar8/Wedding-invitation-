@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — WedCard</title>
+<link rel="stylesheet" href="/css/dashboard.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Cinzel:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <a class="brand-name" href="/">WedCard</a>
+      <div class="brand-link" id="brand-link">Loading…</div>
+    </div>
+    <button class="nav-item active" data-section="details"><span class="ic">&#9998;</span>Details</button>
+    <button class="nav-item" data-section="images"><span class="ic">&#128247;</span>Images</button>
+    <button class="nav-item" data-section="theme"><span class="ic">&#127873;</span>Theme</button>
+    <button class="nav-item" data-section="rsvps"><span class="ic">&#10004;</span>RSVPs</button>
+    <button class="nav-item" data-section="settings"><span class="ic">&#9881;</span>Settings</button>
+    <div class="nav-spacer"></div>
+    <div class="signout">
+      <button class="nav-item" id="signout-btn"><span class="ic">&#8629;</span>Sign Out</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="mobile-bar">
+      <button class="menu-toggle" id="menu-toggle">&#9776;</button>
+      <a href="/" class="brand-name" style="font-family:'Great Vibes',cursive;font-size:1.6rem;color:var(--gold-d);text-decoration:none;">WedCard</a>
+      <span style="width:40px"></span>
+    </div>
+
+    <!-- DETAILS -->
+    <section class="section active" id="section-details">
+      <div class="page-header">
+        <div>
+          <h1>Wedding Details</h1>
+          <p>Edit the names, date, venue and message shown on your invitation.</p>
+        </div>
+        <a href="#" target="_blank" class="btn secondary" id="preview-btn">View Invitation</a>
+      </div>
+
+      <div class="card">
+        <h2>Couple</h2>
+        <p class="desc">Names as they appear on the invitation.</p>
+        <div class="grid-2">
+          <div class="field">
+            <label>Groom's Name</label>
+            <input type="text" id="groom_name" maxlength="60">
+          </div>
+          <div class="field">
+            <label>Bride's Name</label>
+            <input type="text" id="bride_name" maxlength="60">
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Wedding Date & Time</h2>
+        <p class="desc">Used for the countdown and the "Add to Calendar" button.</p>
+        <div class="field">
+          <label>Date and Time</label>
+          <input type="datetime-local" id="wedding_date">
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Venue</h2>
+        <p class="desc">Where the celebration will take place.</p>
+        <div class="field">
+          <label>Venue Name</label>
+          <input type="text" id="venue_name" maxlength="120">
+        </div>
+        <div class="field">
+          <label>Address</label>
+          <input type="text" id="venue_address" maxlength="200">
+        </div>
+        <div class="field">
+          <label>Google Maps Link</label>
+          <input type="url" id="map_url" placeholder="https://maps.app.goo.gl/...">
+          <p class="hint">Paste a Google Maps share link so guests can navigate.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Quote & Message</h2>
+        <p class="desc">A short message shown on your invitation.</p>
+        <div class="field">
+          <label>Quote</label>
+          <textarea id="quote" maxlength="240"></textarea>
+        </div>
+        <div class="field">
+          <label>Presence Note</label>
+          <input type="text" id="presence_text" maxlength="160">
+        </div>
+      </div>
+
+      <button class="btn" id="save-details">Save Changes</button>
+    </section>
+
+    <!-- IMAGES -->
+    <section class="section" id="section-images">
+      <div class="page-header">
+        <div>
+          <h1>Images</h1>
+          <p>Upload your cover photo and gallery memories.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Cover Photo</h2>
+        <p class="desc">The main image displayed on your invitation hero.</p>
+        <label class="image-uploader" id="hero-uploader">
+          <div class="ic">&#11014;</div>
+          <p><strong>Click to upload</strong> or drag and drop</p>
+          <p class="hint" style="margin-top:0.4rem">JPG, PNG, WEBP &middot; up to 5MB</p>
+          <input type="file" accept="image/*" id="hero-input">
+        </label>
+        <div class="hero-preview" id="hero-preview"></div>
+      </div>
+
+      <div class="card">
+        <h2>Gallery</h2>
+        <p class="desc">Add up to 12 photos to display in your invitation gallery.</p>
+        <label class="image-uploader" id="gallery-uploader">
+          <div class="ic">&#11014;</div>
+          <p><strong>Add to gallery</strong></p>
+          <p class="hint" style="margin-top:0.4rem">You can add more after uploading.</p>
+          <input type="file" accept="image/*" id="gallery-input">
+        </label>
+        <div class="gallery-grid" id="gallery-grid"></div>
+      </div>
+    </section>
+
+    <!-- THEME -->
+    <section class="section" id="section-theme">
+      <div class="page-header">
+        <div>
+          <h1>Theme</h1>
+          <p>Pick a design that matches your style.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="theme-list">
+          <div class="theme-option" data-theme="elegant">
+            <div class="preview"></div>
+            <h3>Elegant</h3>
+            <p>Soft gold & cream with falling petals.</p>
+          </div>
+          <div class="theme-option" data-theme="royal">
+            <div class="preview"></div>
+            <h3>Royal</h3>
+            <p>Deep navy with golden accents.</p>
+          </div>
+          <div class="theme-option" data-theme="garden">
+            <div class="preview"></div>
+            <h3>Garden</h3>
+            <p>Fresh greens with floral touches.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RSVPS -->
+    <section class="section" id="section-rsvps">
+      <div class="page-header">
+        <div>
+          <h1>RSVPs</h1>
+          <p>Replies from your guests.</p>
+        </div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card"><div class="num" id="stat-total">0</div><div class="lbl">Total Replies</div></div>
+        <div class="stat-card"><div class="num" id="stat-yes">0</div><div class="lbl">Attending</div></div>
+        <div class="stat-card"><div class="num" id="stat-no">0</div><div class="lbl">Not Attending</div></div>
+        <div class="stat-card"><div class="num" id="stat-guests">0</div><div class="lbl">Total Guests</div></div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Name</th><th>Email</th><th>Reply</th><th>Guests</th><th>Message</th><th>When</th><th></th></tr>
+          </thead>
+          <tbody id="rsvp-tbody">
+            <tr><td colspan="7"><div class="empty-state"><div class="ic">&#128173;</div><p>No replies yet. Share your invitation link to get started!</p></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="section" id="section-settings">
+      <div class="page-header">
+        <div>
+          <h1>Settings</h1>
+          <p>Manage publishing and invitation language.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Publishing</h2>
+        <p class="desc">When unpublished, visitors will see a "not found" page.</p>
+        <div class="field">
+          <label>Status</label>
+          <select id="published">
+            <option value="1">Published — visible to guests</option>
+            <option value="0">Unpublished — hidden</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Account</h2>
+        <p class="desc">Your invitation URL is permanent — choose carefully if you decide to change it later. (Slug changes coming soon.)</p>
+        <div class="field">
+          <label>Email</label>
+          <input type="email" id="account-email" disabled>
+        </div>
+        <div class="field">
+          <label>Your Invitation URL</label>
+          <input type="text" id="account-slug" disabled>
+        </div>
+      </div>
+
+      <button class="btn" id="save-settings">Save Changes</button>
+    </section>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="/js/dashboard.js"></script>
+</body>
+</html>
