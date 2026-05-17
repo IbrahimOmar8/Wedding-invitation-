@@ -3,6 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const multer = require('multer');
 const { authRequired } = require('../auth');
+const cloud = require('../cloudinary');
 
 const router = express.Router();
 
@@ -32,10 +33,20 @@ const upload = multer({
   },
 });
 
-router.post('/', authRequired, upload.single('file'), (req, res) => {
+router.post('/', authRequired, upload.single('file'), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
+
+  if (cloud.isEnabled()) {
+    try {
+      const r = await cloud.uploadFile(req.file.path, `wedcard/${req.user.id}`);
+      return res.json({ url: r.url, filename: r.public_id, storage: 'cloudinary' });
+    } catch (e) {
+      console.warn('[upload] cloudinary failed, falling back to local:', e.message);
+    }
+  }
+
   const url = `/uploads/${req.user.id}/${req.file.filename}`;
-  res.json({ url, filename: req.file.filename });
+  res.json({ url, filename: req.file.filename, storage: 'local' });
 });
 
 router.delete('/:filename', authRequired, (req, res) => {

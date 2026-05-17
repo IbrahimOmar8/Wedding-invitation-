@@ -27,6 +27,9 @@
     <button class="nav-item" data-section="guests"><span class="ic">&#128101;</span>Guests</button>
     <button class="nav-item" data-section="rsvps"><span class="ic">&#10004;</span>RSVPs</button>
     <button class="nav-item" data-section="wishes"><span class="ic">&#128173;</span>Wishes</button>
+    <button class="nav-item" data-section="gifts"><span class="ic">&#127873;</span>Gift Tracking</button>
+    <button class="nav-item" data-section="cohosts"><span class="ic">&#128107;</span>Co-hosts</button>
+    <button class="nav-item" data-section="analytics"><span class="ic">&#128202;</span>Analytics</button>
     <button class="nav-item" data-section="settings"><span class="ic">&#9881;</span>Settings</button>
     <div class="nav-spacer"></div>
     <div class="signout">
@@ -267,18 +270,93 @@
           <div id="wishes-list-admin"></div>
         </section>
 
+        <!-- GIFT TRACKING -->
+        <section class="section" id="section-gifts">
+          <div class="page-header"><div><h1>Gift Tracking</h1><p>Items from your linked Wish Listy wishlist with thank-you tracking.</p></div></div>
+          <div class="stats-row">
+            <div class="stat-card"><div class="num" id="gt-total">0</div><div class="lbl">Total Items</div></div>
+            <div class="stat-card"><div class="num" id="gt-purchased">0</div><div class="lbl">Gifted</div></div>
+            <div class="stat-card"><div class="num" id="gt-reserved">0</div><div class="lbl">Reserved</div></div>
+            <div class="stat-card"><div class="num" id="gt-thanked">0</div><div class="lbl">Thanked</div></div>
+          </div>
+          <div id="gifts-list"></div>
+        </section>
+
+        <!-- COHOSTS -->
+        <section class="section" id="section-cohosts">
+          <div class="page-header"><div><h1>Co-hosts</h1><p>Invite another registered user to co-edit this invitation (e.g. groom + bride share access).</p></div></div>
+          <div class="card">
+            <h2>Invite a co-host</h2>
+            <p class="desc">They must already have a WedCard account. Enter their email, username, or slug.</p>
+            <div class="field"><input type="text" id="co-identifier" placeholder="email@example.com or @username or slug"></div>
+            <button class="btn" id="add-cohost">Add Co-host</button>
+          </div>
+          <div id="cohosts-list"></div>
+          <div class="card" id="cohost-of-card" style="display:none">
+            <h2>Invitations you co-host</h2>
+            <div id="cohost-of-list"></div>
+          </div>
+        </section>
+
+        <!-- ANALYTICS -->
+        <section class="section" id="section-analytics">
+          <div class="page-header"><div><h1>Analytics</h1><p>Where your guests are viewing from.</p></div></div>
+          <div class="card"><h2>Total page views</h2><div class="num" id="an-total" style="font-size:3rem;color:var(--gold-d);font-weight:500">0</div></div>
+          <div class="card"><h2>By country</h2><div id="an-country"></div></div>
+          <div class="card"><h2>Recent days</h2><div id="an-days"></div></div>
+        </section>
+
         <!-- SETTINGS -->
         <section class="section" id="section-settings">
           <div class="page-header"><div><h1>Settings</h1><p>Publishing, account &amp; security.</p></div></div>
           <div class="card">
-            <h2>Publishing</h2>
+            <h2>Publishing &amp; Mode</h2>
             <div class="field">
+              <label>Status</label>
               <select id="published">
                 <option value="1">Published — visible to guests</option>
                 <option value="0">Unpublished — hidden</option>
               </select>
             </div>
+            <div class="field">
+              <label>
+                <input type="checkbox" id="save_the_date_only" style="width:auto;margin-right:0.5rem">
+                Save-the-date mode (hides details, schedule, gallery, RSVP — useful for early announcements)
+              </label>
+            </div>
             <button class="btn" id="save-publish">Save</button>
+          </div>
+
+          <div class="card">
+            <h2>Extras</h2>
+            <div class="field">
+              <label>Live stream URL (YouTube/Zoom)</label>
+              <input type="url" id="livestream_url" placeholder="https://youtube.com/live/...">
+            </div>
+            <div class="field">
+              <label>Background music URL (MP3/OGG)</label>
+              <input type="url" id="music_url" placeholder="https://example.com/song.mp3">
+              <p class="hint">A small ♪ button appears on the invitation page. Guests can opt-in to play it.</p>
+            </div>
+            <div class="field">
+              <label>Custom accent color (hex)</label>
+              <input type="text" id="accent_color" placeholder="#b78a3a" maxlength="9">
+              <p class="hint">Overrides the theme's primary gold/coral.</p>
+            </div>
+            <div class="field">
+              <label>Social share image URL (Open Graph)</label>
+              <input type="url" id="og_image" placeholder="https://...">
+              <p class="hint">Shown in WhatsApp/Facebook previews. Defaults to your cover photo.</p>
+            </div>
+            <button class="btn" id="save-extras">Save Extras</button>
+          </div>
+
+          <div class="card">
+            <h2>Push Notifications</h2>
+            <p class="desc">Get notified on this device when someone RSVPs or reserves a gift.</p>
+            <button class="btn secondary" id="enable-push">Enable on this device</button>
+            <button class="btn secondary" id="disable-push" style="margin-left:0.5rem">Disable</button>
+            <p class="hint" id="push-status" style="margin-top:0.5rem"></p>
           </div>
           <div class="card">
             <h2>Account</h2>

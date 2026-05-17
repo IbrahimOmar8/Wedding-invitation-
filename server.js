@@ -18,6 +18,11 @@ const storyRoutes = require('./src/routes/story');
 const registryRoutes = require('./src/routes/registry');
 const accountRoutes = require('./src/routes/account');
 const wishlistsRoutes = require('./src/routes/wishlists');
+const cohostRoutes = require('./src/routes/cohost');
+const giftsRoutes = require('./src/routes/gifts');
+const analyticsRoutes = require('./src/routes/analytics');
+const cronJobs = require('./src/cron');
+const geoip = require('geoip-lite');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -39,6 +44,9 @@ app.use('/api/story', storyRoutes);
 app.use('/api/registry', registryRoutes);
 app.use('/api/account', accountRoutes);
 app.use('/api/wishlisty', wishlistsRoutes);
+app.use('/api/cohosts', cohostRoutes);
+app.use('/api/gifts', giftsRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
 app.get('/api/themes', (req, res) => {
   const dir = path.join(__dirname, 'views', 'themes');
@@ -57,7 +65,14 @@ async function renderInvitation(slug, guestToken, res) {
     guest = db.prepare('SELECT * FROM guests WHERE token = ? AND invitation_id = ?').get(guestToken, row.id);
   }
 
-  try { db.prepare('UPDATE invitations SET view_count = view_count + 1 WHERE id = ?').run(row.id); } catch (_) {}
+  try {
+    db.prepare('UPDATE invitations SET view_count = view_count + 1 WHERE id = ?').run(row.id);
+    const ip = (res.req.headers['x-forwarded-for'] || res.req.socket.remoteAddress || '').split(',')[0].trim();
+    const geo = ip && geoip.lookup(ip);
+    const country = geo?.country || '';
+    db.prepare('INSERT INTO page_views (invitation_id, country, referer, user_agent) VALUES (?,?,?,?)')
+      .run(row.id, country, String(res.req.headers.referer || '').slice(0, 300), String(res.req.headers['user-agent'] || '').slice(0, 300));
+  } catch (_) {}
 
   const invitation = parseInvitation(row);
   try {
@@ -86,4 +101,5 @@ app.use((req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Wedding SaaS running on http://localhost:${PORT}`);
+  if (process.env.DISABLE_CRON !== '1') cronJobs.start();
 });

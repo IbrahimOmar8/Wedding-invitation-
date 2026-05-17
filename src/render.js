@@ -179,6 +179,39 @@ async function render(invitation, slug, guest = null) {
     ? `<div class="guest-greeting"><span class="gg-label">${escapeHtml(T.HELLO_GUEST)}</span><span class="gg-name">${escapeHtml(guest.name)}</span><span class="gg-note">${escapeHtml(T.PERSONAL_NOTE)}</span></div>`
     : '';
 
+  // Live stream embed
+  const livestreamHtml = invitation.livestream_url
+    ? `<section class="block livestream-section"><div class="center"><p class="label">${escapeHtml(lang === 'ar' ? 'بث مباشر' : 'Live Stream')}</p></div><div class="livestream-wrap"><a class="livestream-link" href="${escapeHtml(safeUrl(invitation.livestream_url))}" target="_blank" rel="noopener">${escapeHtml(lang === 'ar' ? 'انضم للبث المباشر' : 'Join the live stream')} →</a></div></section>`
+    : '';
+
+  // Background music player
+  const musicHtml = invitation.music_url
+    ? `<audio id="bg-music" loop preload="none" src="${escapeHtml(safeUrl(invitation.music_url))}"></audio>
+       <button id="music-toggle" type="button" aria-label="Toggle music" title="Toggle music">♪</button>
+       <script>(function(){const a=document.getElementById('bg-music'),b=document.getElementById('music-toggle');if(!a)return;let p=false;b.addEventListener('click',async()=>{if(p){a.pause();b.classList.remove('on');}else{try{await a.play();b.classList.add('on');}catch(_){}}p=!p;});})();</script>`
+    : '';
+
+  // Custom accent color override
+  const accentCss = invitation.accent_color
+    ? `<style>:root { --gold: ${escapeHtml(invitation.accent_color)} !important; --gold-d: ${escapeHtml(invitation.accent_color)} !important; --coral: ${escapeHtml(invitation.accent_color)} !important; --leaf: ${escapeHtml(invitation.accent_color)} !important; --wood: ${escapeHtml(invitation.accent_color)} !important; --burnt: ${escapeHtml(invitation.accent_color)} !important; --sea: ${escapeHtml(invitation.accent_color)} !important; }</style>`
+    : '';
+
+  // Open Graph meta tags
+  const ogImage = invitation.og_image || hero;
+  const isAbsolute = /^https?:\/\//i.test(ogImage);
+  const ogImageFull = isAbsolute ? ogImage : (process.env.PUBLIC_URL ? `${process.env.PUBLIC_URL}${ogImage}` : ogImage);
+  const ogDescription = `${invitation.groom_name} & ${invitation.bride_name} — ${dt.dateLong}${invitation.venue_name ? ' · ' + invitation.venue_name : ''}`;
+  const ogMeta = `<meta property="og:type" content="website">
+<meta property="og:title" content="${escapeHtml(invitation.groom_name)} &amp; ${escapeHtml(invitation.bride_name)}">
+<meta property="og:description" content="${escapeHtml(ogDescription)}">
+<meta property="og:image" content="${escapeHtml(ogImageFull)}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="${escapeHtml(invitation.groom_name)} &amp; ${escapeHtml(invitation.bride_name)}">
+<meta name="twitter:description" content="${escapeHtml(ogDescription)}">
+<meta name="twitter:image" content="${escapeHtml(ogImageFull)}">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="${invitation.accent_color || '#b78a3a'}">`;
+
   const vars = {
     GROOM: escapeHtml(invitation.groom_name),
     BRIDE: escapeHtml(invitation.bride_name),
@@ -205,6 +238,11 @@ async function render(invitation, slug, guest = null) {
     SLUG: escapeHtml(slug),
     LANG: lang,
     DIR: lang === 'ar' ? 'rtl' : 'ltr',
+    LIVESTREAM_HTML: livestreamHtml,
+    MUSIC_HTML: musicHtml,
+    ACCENT_CSS: accentCss,
+    OG_META: ogMeta,
+    SAVE_THE_DATE_CLASS: invitation.save_the_date_only ? 'std-mode' : '',
   };
 
   // Translation tokens prefixed with T_

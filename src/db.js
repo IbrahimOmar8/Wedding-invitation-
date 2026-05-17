@@ -136,5 +136,57 @@ addColumnIfMissing('users', 'wishlisty_refresh_token', 'TEXT');
 addColumnIfMissing('users', 'wishlisty_token_expires_at', 'TEXT');
 addColumnIfMissing('users', 'wishlisty_event_id', 'TEXT');
 addColumnIfMissing('users', 'wishlisty_wishlist_id', 'TEXT');
+addColumnIfMissing('users', 'fcm_token', 'TEXT');
+
+// Invitation extension columns
+addColumnIfMissing('invitations', 'livestream_url', "TEXT DEFAULT ''");
+addColumnIfMissing('invitations', 'music_url', "TEXT DEFAULT ''");
+addColumnIfMissing('invitations', 'accent_color', "TEXT DEFAULT ''");
+addColumnIfMissing('invitations', 'save_the_date_only', 'INTEGER DEFAULT 0');
+addColumnIfMissing('invitations', 'og_image', "TEXT DEFAULT ''");
+
+// New tables for co-hosts, gift thank-you tracking, page views
+db.exec(`
+  CREATE TABLE IF NOT EXISTS cohosts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    invitation_id INTEGER NOT NULL REFERENCES invitations(id) ON DELETE CASCADE,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    role TEXT DEFAULT 'editor',
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(invitation_id, user_id)
+  );
+
+  CREATE TABLE IF NOT EXISTS gift_notes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    invitation_id INTEGER NOT NULL REFERENCES invitations(id) ON DELETE CASCADE,
+    wishlisty_item_id TEXT NOT NULL,
+    thank_you_sent INTEGER DEFAULT 0,
+    note TEXT DEFAULT '',
+    updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(invitation_id, wishlisty_item_id)
+  );
+
+  CREATE TABLE IF NOT EXISTS page_views (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    invitation_id INTEGER NOT NULL REFERENCES invitations(id) ON DELETE CASCADE,
+    country TEXT DEFAULT '',
+    referer TEXT DEFAULT '',
+    user_agent TEXT DEFAULT '',
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS reminders_sent (
+    invitation_id INTEGER NOT NULL REFERENCES invitations(id) ON DELETE CASCADE,
+    kind TEXT NOT NULL,
+    sent_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (invitation_id, kind)
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_cohosts_user ON cohosts(user_id);
+  CREATE INDEX IF NOT EXISTS idx_cohosts_invitation ON cohosts(invitation_id);
+  CREATE INDEX IF NOT EXISTS idx_gift_notes_invitation ON gift_notes(invitation_id);
+  CREATE INDEX IF NOT EXISTS idx_page_views_invitation ON page_views(invitation_id);
+  CREATE INDEX IF NOT EXISTS idx_page_views_country ON page_views(invitation_id, country);
+`);
 
 module.exports = db;

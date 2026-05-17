@@ -30,6 +30,18 @@ router.delete('/', authRequired, (req, res) => {
   res.json({ ok: true });
 });
 
+router.put('/fcm-token', authRequired, (req, res) => {
+  const { token } = req.body || {};
+  if (!token) return res.status(400).json({ error: 'token required' });
+  db.prepare('UPDATE users SET fcm_token = ? WHERE id = ?').run(String(token).slice(0, 4096), req.user.id);
+  res.json({ ok: true });
+});
+
+router.delete('/fcm-token', authRequired, (req, res) => {
+  db.prepare('UPDATE users SET fcm_token = NULL WHERE id = ?').run(req.user.id);
+  res.json({ ok: true });
+});
+
 router.get('/stats', authRequired, (req, res) => {
   const inv = db.prepare('SELECT id, view_count FROM invitations WHERE user_id = ?').get(req.user.id);
   if (!inv) return res.json({ stats: {} });

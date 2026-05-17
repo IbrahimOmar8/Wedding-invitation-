@@ -176,6 +176,86 @@ async function main() {
   const arHtml = await arResp.text();
   ok('Arabic render', arHtml.includes('dir="rtl"') && /(احفظ|دعوة|تفاصيل)/.test(arHtml));
 
+  // ─── 12. Extras: accent color + livestream + music + OG ───
+  console.log('\n--- Stage 11: extras (accent, livestream, music, OG) ---');
+  const extras = await json('PUT', '/api/invitation', {
+    language: 'en',
+    accent_color: '#5d7d5a',
+    livestream_url: 'https://youtube.com/live/test-stream',
+    music_url: 'https://example.com/song.mp3',
+    og_image: 'https://example.com/cover.jpg',
+  }, wcToken);
+  ok('extras saved', extras.status === 200, JSON.stringify(extras.data).slice(0, 200));
+  const extResp = await fetch(`${HOST}/i/${slug}`);
+  const extHtml = await extResp.text();
+  ok('OG meta present', extHtml.includes('property="og:title"') && extHtml.includes('og:image'));
+  ok('accent color applied', extHtml.includes('#5d7d5a'));
+  ok('livestream section present', extHtml.includes('Join the live stream') || extHtml.includes('youtube.com/live'));
+  ok('music toggle present', extHtml.includes('id="music-toggle"') && extHtml.includes('song.mp3'));
+  ok('manifest linked', extHtml.includes('/manifest.json'));
+  ok('sw registration', extHtml.includes("navigator.serviceWorker.register('/sw.js')"));
+
+  // ─── 13. Save-the-date mode ───
+  console.log('\n--- Stage 12: save-the-date mode ---');
+  await json('PUT', '/api/invitation', { save_the_date_only: 1 }, wcToken);
+  const stdResp = await fetch(`${HOST}/i/${slug}`);
+  const stdHtml = await stdResp.text();
+  ok('save-the-date class', stdHtml.includes('class="std-mode"'));
+  await json('PUT', '/api/invitation', { save_the_date_only: 0 }, wcToken);
+
+  // ─── 14. Analytics: views recorded ───
+  console.log('\n--- Stage 13: analytics ---');
+  const an = await json('GET', '/api/analytics', null, wcToken);
+  ok('analytics total > 0', an.status === 200 && an.data.total > 0, JSON.stringify(an.data));
+
+  // ─── 15. Gift tracking ───
+  console.log('\n--- Stage 14: gift tracking ---');
+  const gifts = await json('GET', '/api/gifts', null, wcToken);
+  ok('gifts endpoint HTTP 200', gifts.status === 200, JSON.stringify(gifts.data).slice(0, 200));
+  // wishlist has 0 items yet, so just check structure
+  ok('gifts has stats', !!gifts.data?.stats);
+
+  // ─── 16. Co-hosts ───
+  console.log('\n--- Stage 15: cohosts (create second user, invite them) ---');
+  const addr2 = `wedcard-co${Date.now()}@${domain}`;
+  await mailtm('POST', '/accounts', { address: addr2, password: pw });
+  const mt2 = await mailtm('POST', '/token', { address: addr2, password: pw });
+  const co_signup = await json('POST', '/api/auth/signup', {
+    fullName: 'E2E Cohost', username: addr2, password: pw, slug: `co-${ts.toString().slice(-6)}`,
+  });
+  ok('cohost signup HTTP 200', co_signup.status === 200);
+  // Wait for OTP
+  let otp2 = '';
+  for (let i = 1; i <= 30; i++) {
+    const list = mailtmList(await mailtm('GET', '/messages', null, mt2.token));
+    if (list.length) {
+      const full = await mailtm('GET', '/messages/' + list[0].id, null, mt2.token);
+      const m = ((full.text || '') + ' ' + (Array.isArray(full.html) ? full.html.join(' ') : (full.html || ''))).match(/\b(\d{4,8})\b/);
+      if (m) { otp2 = m[1]; break; }
+    }
+    await new Promise(r => setTimeout(r, 2000));
+  }
+  ok('cohost OTP received', !!otp2);
+  await json('POST', '/api/auth/verify-otp', { username: addr2, otp: otp2, slug: `co-${ts.toString().slice(-6)}`, password: pw });
+  const inviteResp = await json('POST', '/api/cohosts', { identifier: addr2 }, wcToken);
+  ok('cohost invite HTTP 200', inviteResp.status === 200, JSON.stringify(inviteResp.data));
+  const coList = await json('GET', '/api/cohosts', null, wcToken);
+  ok('cohost appears in list', Array.isArray(coList.data?.cohosts) && coList.data.cohosts.length > 0);
+
+  // ─── 17. PWA manifest reachable ───
+  console.log('\n--- Stage 16: PWA assets ---');
+  const manifest = await fetch(`${HOST}/manifest.json`);
+  ok('manifest.json HTTP 200', manifest.status === 200);
+  const sw = await fetch(`${HOST}/sw.js`);
+  ok('sw.js HTTP 200', sw.status === 200);
+
+  // ─── 18. FCM token endpoint ───
+  console.log('\n--- Stage 17: FCM token endpoint ---');
+  const fcmSet = await json('PUT', '/api/account/fcm-token', { token: 'test-fcm-token-abc' }, wcToken);
+  ok('fcm token set HTTP 200', fcmSet.status === 200);
+  const fcmDel = await json('DELETE', '/api/account/fcm-token', null, wcToken);
+  ok('fcm token delete HTTP 200', fcmDel.status === 200);
+
   console.log('\n===== Summary =====');
   console.log('  Mailbox:    ', addr);
   console.log('  Slug:       ', slug);

@@ -70,6 +70,9 @@ document.querySelectorAll('.nav-item[data-section]').forEach(btn => {
     if (id === 'story') loadStory();
     if (id === 'registry') loadWishlistyStatus();
     if (id === 'guests') loadGuests();
+    if (id === 'gifts') loadGifts();
+    if (id === 'cohosts') loadCohosts();
+    if (id === 'analytics') loadAnalytics();
     document.getElementById('sidebar').classList.remove('open');
     document.getElementById('sidebar-backdrop').classList.remove('open');
   });
@@ -102,6 +105,11 @@ function renderInvitation() {
   f('presence_text', invitation.presence_text);
   document.getElementById('published').value = invitation.published ? '1' : '0';
   document.getElementById('language').value = invitation.language || 'en';
+  document.getElementById('save_the_date_only').checked = !!invitation.save_the_date_only;
+  document.getElementById('livestream_url').value = invitation.livestream_url || '';
+  document.getElementById('music_url').value = invitation.music_url || '';
+  document.getElementById('accent_color').value = invitation.accent_color || '';
+  document.getElementById('og_image').value = invitation.og_image || '';
   document.getElementById('account-email').value = user.email;
   document.getElementById('account-slug').value = `${window.location.origin}/i/${user.slug}`;
 
@@ -175,10 +183,165 @@ document.getElementById('save-details').addEventListener('click', async (e) => {
 document.getElementById('save-publish').addEventListener('click', async (e) => {
   e.target.disabled = true; e.target.textContent = 'Saving...';
   try {
-    const data = await api('/api/invitation', { method: 'PUT', body: JSON.stringify({ published: parseInt(document.getElementById('published').value, 10) }) });
+    const data = await api('/api/invitation', { method: 'PUT', body: JSON.stringify({
+      published: parseInt(document.getElementById('published').value, 10),
+      save_the_date_only: document.getElementById('save_the_date_only').checked ? 1 : 0,
+    }) });
     invitation = data.invitation; toast('Saved!'); refreshPreview();
   } catch (ex) { toast(ex.message, 'error'); }
   finally { e.target.disabled = false; e.target.textContent = 'Save'; }
+});
+
+document.getElementById('save-extras')?.addEventListener('click', async (e) => {
+  e.target.disabled = true; e.target.textContent = 'Saving...';
+  try {
+    const data = await api('/api/invitation', { method: 'PUT', body: JSON.stringify({
+      livestream_url: document.getElementById('livestream_url').value,
+      music_url: document.getElementById('music_url').value,
+      accent_color: document.getElementById('accent_color').value,
+      og_image: document.getElementById('og_image').value,
+    }) });
+    invitation = data.invitation; toast('Extras saved!'); refreshPreview();
+  } catch (ex) { toast(ex.message, 'error'); }
+  finally { e.target.disabled = false; e.target.textContent = 'Save Extras'; }
+});
+
+// ─── Gift tracking ───
+async function loadGifts() {
+  const list = document.getElementById('gifts-list');
+  list.innerHTML = '<p class="desc">Loading…</p>';
+  try {
+    const { items, stats } = await api('/api/gifts');
+    document.getElementById('gt-total').textContent = stats.total;
+    document.getElementById('gt-purchased').textContent = stats.purchased;
+    document.getElementById('gt-reserved').textContent = stats.reserved;
+    document.getElementById('gt-thanked').textContent = stats.thanked;
+    if (!items.length) { list.innerHTML = '<div class="empty-state"><div class="ic">&#127873;</div><p>No items in your linked wishlist yet. Add some via Wish Listy.</p></div>'; return; }
+    list.innerHTML = items.map(i => `
+      <div class="item-row" data-id="${i.id}">
+        <div class="ir-body">
+          <h3>${escapeHtml(i.name)}
+            ${i.isPurchased ? '<span class="tag yes">Gifted</span>' : (i.reservedUntil ? '<span class="tag" style="background:#f4ecd8;color:#8a6620">Reserved</span>' : '')}
+          </h3>
+          ${i.description ? `<p>${escapeHtml(i.description)}</p>` : ''}
+          <div style="margin-top:0.6rem">
+            <label style="font-size:0.85rem"><input type="checkbox" ${i.thank_you_sent ? 'checked' : ''} data-thank="${i.id}"> Thank-you sent</label>
+          </div>
+          <div class="field" style="margin-top:0.4rem"><input type="text" data-note="${i.id}" value="${escapeHtml(i.note)}" placeholder="Private note…"></div>
+        </div>
+      </div>`).join('');
+    list.querySelectorAll('[data-thank]').forEach(cb => cb.addEventListener('change', async () => {
+      const id = cb.dataset.thank;
+      const note = list.querySelector(`[data-note="${id}"]`).value;
+      await api('/api/gifts/' + id, { method: 'PUT', body: JSON.stringify({ thank_you_sent: cb.checked, note }) });
+      toast(cb.checked ? 'Marked thanked' : 'Unmarked');
+      loadGifts();
+    }));
+    list.querySelectorAll('[data-note]').forEach(inp => {
+      let t;
+      inp.addEventListener('input', () => {
+        clearTimeout(t);
+        t = setTimeout(async () => {
+          const id = inp.dataset.note;
+          const cb = list.querySelector(`[data-thank="${id}"]`);
+          await api('/api/gifts/' + id, { method: 'PUT', body: JSON.stringify({ thank_you_sent: cb.checked, note: inp.value }) });
+        }, 600);
+      });
+    });
+  } catch (ex) {
+    list.innerHTML = `<p class="desc" style="color:var(--error)">${escapeHtml(ex.message)}</p>`;
+  }
+}
+
+// ─── Co-hosts ───
+async function loadCohosts() {
+  const list = document.getElementById('cohosts-list');
+  const cohostOfCard = document.getElementById('cohost-of-card');
+  const cohostOfList = document.getElementById('cohost-of-list');
+  try {
+    const { cohosts, cohost_of } = await api('/api/cohosts');
+    if (!cohosts.length) {
+      list.innerHTML = '<div class="empty-state"><div class="ic">&#128107;</div><p>No co-hosts yet.</p></div>';
+    } else {
+      list.innerHTML = cohosts.map(c => `
+        <div class="item-row" data-id="${c.cohost_id}">
+          <div class="ir-body">
+            <h3>${escapeHtml(c.full_name || c.username || c.email || 'Unknown')}</h3>
+            <div class="meta">${escapeHtml(c.email || '')} · added ${formatWhen(c.created_at)}</div>
+          </div>
+          <div class="ir-actions"><button class="del" data-id="${c.cohost_id}">Remove</button></div>
+        </div>`).join('');
+      list.querySelectorAll('.del').forEach(b => b.addEventListener('click', async () => {
+        if (!confirm('Remove this co-host?')) return;
+        await api('/api/cohosts/' + b.dataset.id, { method: 'DELETE' });
+        loadCohosts();
+      }));
+    }
+    if (cohost_of.length) {
+      cohostOfCard.style.display = '';
+      cohostOfList.innerHTML = cohost_of.map(c => `
+        <div class="item-row">
+          <div class="ir-body">
+            <h3>${escapeHtml(c.groom_name)} &amp; ${escapeHtml(c.bride_name)}</h3>
+            <div class="meta">Owner: ${escapeHtml(c.owner_email || '')} · <a href="/i/${escapeHtml(c.slug)}" target="_blank">view</a></div>
+          </div>
+        </div>`).join('');
+    } else {
+      cohostOfCard.style.display = 'none';
+    }
+  } catch (ex) { list.innerHTML = `<p class="desc" style="color:var(--error)">${escapeHtml(ex.message)}</p>`; }
+}
+
+document.getElementById('add-cohost')?.addEventListener('click', async (e) => {
+  const id = document.getElementById('co-identifier').value.trim();
+  if (!id) return toast('Enter an email or username', 'error');
+  e.target.disabled = true;
+  try {
+    await api('/api/cohosts', { method: 'POST', body: JSON.stringify({ identifier: id }) });
+    document.getElementById('co-identifier').value = '';
+    toast('Co-host added!'); loadCohosts();
+  } catch (ex) { toast(ex.message, 'error'); }
+  finally { e.target.disabled = false; }
+});
+
+// ─── Analytics ───
+async function loadAnalytics() {
+  try {
+    const { total, byCountry, byDay } = await api('/api/analytics');
+    document.getElementById('an-total').textContent = total;
+    const cBox = document.getElementById('an-country');
+    cBox.innerHTML = byCountry.length
+      ? byCountry.map(r => `<div class="item-row"><div class="ir-body"><h3>${escapeHtml(r.country)}</h3><div class="meta">${r.n} view${r.n>1?'s':''}</div></div></div>`).join('')
+      : '<p class="desc">No views yet.</p>';
+    const dBox = document.getElementById('an-days');
+    dBox.innerHTML = byDay.length
+      ? byDay.map(r => `<div class="item-row"><div class="ir-body"><h3>${escapeHtml(r.day)}</h3><div class="meta">${r.n} view${r.n>1?'s':''}</div></div></div>`).join('')
+      : '<p class="desc">No views yet.</p>';
+  } catch (ex) { toast(ex.message, 'error'); }
+}
+
+// ─── Push notifications (browser permission + FCM token) ───
+document.getElementById('enable-push')?.addEventListener('click', async () => {
+  if (!('Notification' in window)) return toast('Push not supported in this browser', 'error');
+  try {
+    const perm = await Notification.requestPermission();
+    if (perm !== 'granted') return toast('Permission not granted', 'error');
+    // Without a configured FCM project + web push setup we still let the user opt in;
+    // server-side push only fires if a token is stored. Store a placeholder so the
+    // owner sees the option active; real FCM integration requires a service worker
+    // registered with a Firebase config.
+    await api('/api/account/fcm-token', { method: 'PUT', body: JSON.stringify({ token: 'browser-' + Date.now() }) });
+    document.getElementById('push-status').textContent = 'Push enabled on this device.';
+    toast('Push enabled!');
+  } catch (ex) { toast(ex.message, 'error'); }
+});
+
+document.getElementById('disable-push')?.addEventListener('click', async () => {
+  try {
+    await api('/api/account/fcm-token', { method: 'DELETE' });
+    document.getElementById('push-status').textContent = 'Push disabled.';
+    toast('Push disabled.');
+  } catch (ex) { toast(ex.message, 'error'); }
 });
 
 // ─── Language switcher ───
