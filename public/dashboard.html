@@ -29,7 +29,10 @@
     <button class="nav-item" data-section="wishes"><span class="ic">&#128173;</span>Wishes</button>
     <button class="nav-item" data-section="gifts"><span class="ic">&#127873;</span>Gift Tracking</button>
     <button class="nav-item" data-section="cohosts"><span class="ic">&#128107;</span>Co-hosts</button>
+    <button class="nav-item" data-section="seating"><span class="ic">&#127860;</span>Seating</button>
+    <button class="nav-item" data-section="photo-wall"><span class="ic">&#128249;</span>Photo Wall</button>
     <button class="nav-item" data-section="music"><span class="ic">&#127925;</span>Songs</button>
+    <button class="nav-item" data-section="activity"><span class="ic">&#128240;</span>Activity</button>
     <button class="nav-item" data-section="analytics"><span class="ic">&#128202;</span>Analytics</button>
     <button class="nav-item" data-section="settings"><span class="ic">&#9881;</span>Settings</button>
     <div class="nav-spacer"></div>
@@ -306,6 +309,27 @@
           </div>
         </section>
 
+        <!-- SEATING -->
+        <section class="section" id="section-seating">
+          <div class="page-header"><div><h1>Seating Chart</h1><p>Assign your guests to tables.</p></div></div>
+          <div class="card">
+            <h2>Add a table</h2>
+            <div class="grid-2">
+              <div class="field"><label>Table name</label><input type="text" id="st-name" placeholder="e.g. Family"></div>
+              <div class="field"><label>Capacity</label><input type="number" id="st-capacity" value="8" min="1" max="50"></div>
+            </div>
+            <div class="field"><label>Note (optional)</label><input type="text" id="st-note"></div>
+            <button class="btn" id="add-table">Add Table</button>
+          </div>
+          <div id="tables-list"></div>
+        </section>
+
+        <!-- PHOTO WALL -->
+        <section class="section" id="section-photo-wall">
+          <div class="page-header"><div><h1>Photo Wall</h1><p>Moderate photos uploaded by your guests after the wedding.</p></div></div>
+          <div id="photo-wall-list"></div>
+        </section>
+
         <!-- MUSIC REQUESTS -->
         <section class="section" id="section-music">
           <div class="page-header">
@@ -313,6 +337,12 @@
             <a href="/api/music/export" class="btn secondary" id="export-music">Export CSV</a>
           </div>
           <div id="music-list"></div>
+        </section>
+
+        <!-- ACTIVITY -->
+        <section class="section" id="section-activity">
+          <div class="page-header"><div><h1>Activity</h1><p>Recent events across your invitation and Wish Listy.</p></div></div>
+          <div id="activity-feed"></div>
         </section>
 
         <!-- ANALYTICS -->
@@ -366,6 +396,13 @@
               <p class="hint">Shown in WhatsApp/Facebook previews. Defaults to your cover photo.</p>
             </div>
             <button class="btn" id="save-extras">Save Extras</button>
+          </div>
+
+          <div class="card" id="billing-card" style="display:none">
+            <h2>Premium</h2>
+            <p class="desc" id="billing-status">Loading…</p>
+            <button class="btn" id="billing-upgrade" style="display:none">Upgrade to Premium</button>
+            <button class="btn secondary" id="billing-manage" style="display:none">Manage subscription</button>
           </div>
 
           <div class="card">

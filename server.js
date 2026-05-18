@@ -27,6 +27,10 @@ const analyticsRoutes = require('./src/routes/analytics');
 const publicReserveRoutes = require('./src/routes/publicReserve');
 const musicRoutes = require('./src/routes/music');
 const friendsRoutes = require('./src/routes/friends');
+const seatingRoutes = require('./src/routes/seating');
+const guestPhotosRoutes = require('./src/routes/guestPhotos');
+const activityRoutes = require('./src/routes/activity');
+const billingRoutes = require('./src/routes/billing');
 const cronJobs = require('./src/cron');
 const geoip = require('geoip-lite');
 
@@ -71,6 +75,10 @@ app.use('/api/analytics', analyticsRoutes);
 app.use('/api/public/reserve', security.publicWriteLimiter, publicReserveRoutes);
 app.use('/api/music', musicRoutes);
 app.use('/api/friends', friendsRoutes);
+app.use('/api/seating', seatingRoutes);
+app.use('/api/guest-photos', guestPhotosRoutes);
+app.use('/api/activity', activityRoutes);
+app.use('/api/billing', billingRoutes);
 
 app.get('/api/themes', (req, res) => {
   const dir = path.join(__dirname, 'views', 'themes');

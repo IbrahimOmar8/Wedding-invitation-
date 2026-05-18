@@ -74,6 +74,10 @@ document.querySelectorAll('.nav-item[data-section]').forEach(btn => {
     if (id === 'cohosts') loadCohosts();
     if (id === 'analytics') loadAnalytics();
     if (id === 'music') loadMusic();
+    if (id === 'seating') loadSeating();
+    if (id === 'photo-wall') loadPhotoWall();
+    if (id === 'activity') loadActivity();
+    if (id === 'settings') loadBilling();
     document.getElementById('sidebar').classList.remove('open');
     document.getElementById('sidebar-backdrop').classList.remove('open');
   });
@@ -393,6 +397,153 @@ document.getElementById('import-friends')?.addEventListener('click', async (e) =
     });
   } catch (ex) { box.innerHTML = `<p class="desc" style="color:var(--error)">${escapeHtml(ex.message)}</p>`; }
   finally { e.target.disabled = false; }
+});
+
+// ─── Seating chart ───
+async function loadSeating() {
+  const list = document.getElementById('tables-list');
+  try {
+    const { tables, guests } = await api('/api/seating');
+    if (!tables.length) {
+      list.innerHTML = '<div class="empty-state"><div class="ic">&#127860;</div><p>No tables yet. Add your first table above.</p></div>';
+      return;
+    }
+    list.innerHTML = tables.map(t => {
+      const assignedGuests = guests.filter(g => g.seating_table_id === t.id);
+      const unassigned = guests.filter(g => !g.seating_table_id);
+      return `
+        <div class="card" data-table="${t.id}">
+          <h2>${escapeHtml(t.name)} <span style="font-weight:400;opacity:0.6;font-size:0.85em">(${t.assigned}/${t.capacity})</span></h2>
+          ${t.note ? `<p class="desc">${escapeHtml(t.note)}</p>` : ''}
+          <div style="margin-top:0.8rem">
+            ${assignedGuests.map(g => `
+              <div class="item-row">
+                <div class="ir-body"><h3>${escapeHtml(g.name)}</h3></div>
+                <div class="ir-actions"><button data-unassign="${g.id}">Remove</button></div>
+              </div>`).join('')}
+          </div>
+          ${unassigned.length ? `
+            <div class="field" style="margin-top:1rem">
+              <label>Add guest</label>
+              <select data-assign-to="${t.id}">
+                <option value="">— pick a guest —</option>
+                ${unassigned.map(g => `<option value="${g.id}">${escapeHtml(g.name)}</option>`).join('')}
+              </select>
+            </div>` : '<p class="desc">All guests assigned. <button class="btn sm secondary" data-del-table="' + t.id + '" style="margin-top:0.5rem">Delete table</button></p>'}
+        </div>`;
+    }).join('');
+    list.querySelectorAll('[data-assign-to]').forEach(sel => sel.addEventListener('change', async e => {
+      if (!e.target.value) return;
+      await api('/api/seating/assign/' + e.target.value, { method: 'PUT', body: JSON.stringify({ table_id: parseInt(e.target.dataset.assignTo, 10) }) });
+      loadSeating();
+    }));
+    list.querySelectorAll('[data-unassign]').forEach(b => b.addEventListener('click', async () => {
+      await api('/api/seating/assign/' + b.dataset.unassign, { method: 'PUT', body: JSON.stringify({ table_id: null }) });
+      loadSeating();
+    }));
+    list.querySelectorAll('[data-del-table]').forEach(b => b.addEventListener('click', async () => {
+      if (!confirm('Delete this table?')) return;
+      await api('/api/seating/' + b.dataset.delTable, { method: 'DELETE' });
+      loadSeating();
+    }));
+  } catch (ex) { list.innerHTML = `<p class="desc" style="color:var(--error)">${escapeHtml(ex.message)}</p>`; }
+}
+
+document.getElementById('add-table')?.addEventListener('click', async (e) => {
+  const name = document.getElementById('st-name').value.trim();
+  if (!name) return toast('Name required', 'error');
+  try {
+    await api('/api/seating', { method: 'POST', body: JSON.stringify({
+      name, capacity: parseInt(document.getElementById('st-capacity').value, 10) || 8,
+      note: document.getElementById('st-note').value,
+    }) });
+    ['st-name', 'st-capacity', 'st-note'].forEach(i => document.getElementById(i).value = i === 'st-capacity' ? 8 : '');
+    loadSeating(); toast('Table added!');
+  } catch (ex) { toast(ex.message, 'error'); }
+});
+
+// ─── Photo wall moderation ───
+async function loadPhotoWall() {
+  const list = document.getElementById('photo-wall-list');
+  list.innerHTML = '<p class="desc">Loading…</p>';
+  try {
+    const { photos } = await api('/api/guest-photos');
+    if (!photos.length) { list.innerHTML = '<div class="empty-state"><div class="ic">&#128249;</div><p>No photos yet.</p></div>'; return; }
+    list.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0.8rem">` +
+      photos.map(p => `
+        <div style="background:var(--white);border:1px solid var(--border);border-radius:8px;overflow:hidden">
+          <img src="${escapeHtml(p.url)}" style="width:100%;aspect-ratio:1;object-fit:cover;display:block">
+          <div style="padding:0.6rem">
+            <div style="font-size:0.9rem;font-weight:500">${escapeHtml(p.guest_name)}</div>
+            ${p.caption ? `<div style="font-size:0.82rem;color:var(--ink-soft);margin-top:0.2rem">${escapeHtml(p.caption)}</div>` : ''}
+            <div style="margin-top:0.5rem;display:flex;gap:0.3rem">
+              <button class="btn sm ${p.approved ? 'secondary' : ''}" data-toggle="${p.id}" data-approved="${p.approved}">${p.approved ? 'Hide' : 'Approve'}</button>
+              <button class="btn sm danger" data-del="${p.id}">Delete</button>
+            </div>
+          </div>
+        </div>`).join('') +
+      `</div>`;
+    list.querySelectorAll('[data-toggle]').forEach(b => b.addEventListener('click', async () => {
+      await api('/api/guest-photos/' + b.dataset.toggle, { method: 'PUT', body: JSON.stringify({ approved: b.dataset.approved === '1' ? 0 : 1 }) });
+      loadPhotoWall();
+    }));
+    list.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', async () => {
+      if (!confirm('Delete this photo?')) return;
+      await api('/api/guest-photos/' + b.dataset.del, { method: 'DELETE' });
+      loadPhotoWall();
+    }));
+  } catch (ex) { list.innerHTML = `<p class="desc" style="color:var(--error)">${escapeHtml(ex.message)}</p>`; }
+}
+
+// ─── Activity feed ───
+async function loadActivity() {
+  const list = document.getElementById('activity-feed');
+  list.innerHTML = '<p class="desc">Loading…</p>';
+  try {
+    const { activities } = await api('/api/activity');
+    if (!activities.length) { list.innerHTML = '<div class="empty-state"><div class="ic">&#128240;</div><p>No activity yet.</p></div>'; return; }
+    const iconMap = { rsvp: '✓', wish: '💭', music: '🎵', photo: '📷', wishlisty: '🎁' };
+    list.innerHTML = activities.map(a => `
+      <div class="item-row">
+        <div class="ir-body">
+          <h3>${iconMap[a.kind] || '•'} ${escapeHtml(a.title)} <span style="opacity:0.5;font-size:0.85em;font-weight:400">(${escapeHtml(a.kind)})</span></h3>
+          <div class="meta">${escapeHtml(String(a.detail || '').slice(0, 200))} · ${formatWhen(a.at)}</div>
+        </div>
+      </div>`).join('');
+  } catch (ex) { list.innerHTML = `<p class="desc" style="color:var(--error)">${escapeHtml(ex.message)}</p>`; }
+}
+
+// ─── Billing ───
+async function loadBilling() {
+  try {
+    const s = await api('/api/billing/status');
+    if (!s.configured) return; // hide card entirely if Stripe not configured
+    const card = document.getElementById('billing-card');
+    card.style.display = '';
+    if (s.is_premium) {
+      document.getElementById('billing-status').innerHTML = `✓ Premium active${s.premium_until ? ' until ' + new Date(s.premium_until).toLocaleDateString() : ''}`;
+      document.getElementById('billing-upgrade').style.display = 'none';
+      document.getElementById('billing-manage').style.display = '';
+    } else {
+      document.getElementById('billing-status').textContent = 'Unlock unlimited photos, custom domains, and more.';
+      document.getElementById('billing-upgrade').style.display = '';
+      document.getElementById('billing-manage').style.display = 'none';
+    }
+  } catch (_) {}
+}
+
+document.getElementById('billing-upgrade')?.addEventListener('click', async () => {
+  try {
+    const { url } = await api('/api/billing/checkout', { method: 'POST', body: JSON.stringify({}) });
+    if (url) window.location.href = url;
+  } catch (ex) { toast(ex.message, 'error'); }
+});
+
+document.getElementById('billing-manage')?.addEventListener('click', async () => {
+  try {
+    const { url } = await api('/api/billing/portal', { method: 'POST', body: JSON.stringify({}) });
+    if (url) window.location.href = url;
+  } catch (ex) { toast(ex.message, 'error'); }
 });
 
 // ─── Push notifications (browser permission + FCM token) ───

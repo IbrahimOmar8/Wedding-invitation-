@@ -311,6 +311,47 @@ async function main() {
   ok('helmet headers applied', sec.headers.get('x-frame-options') && sec.headers.get('x-content-type-options') === 'nosniff');
   ok('rate-limit headers applied (general API)', !!(await fetch(`${HOST}/api/health`)).headers.get('ratelimit-limit'));
 
+  // ─── 24. Seating chart ───
+  console.log('\n--- Stage 23: seating chart ---');
+  const tbl = await json('POST', '/api/seating', { name: 'Family', capacity: 6 }, wcToken);
+  ok('table create HTTP 200', tbl.status === 200);
+  const tblId = tbl.data?.table?.id;
+  const seatList = await json('GET', '/api/seating', null, wcToken);
+  ok('seating list returns table', Array.isArray(seatList.data?.tables) && seatList.data.tables.length > 0);
+
+  // Add a guest then assign them
+  const g = await json('POST', '/api/guests', { name: 'Seated Guest', max_guests: 2 }, wcToken);
+  const gid = g.data?.guest?.id;
+  if (tblId && gid) {
+    const a = await json('PUT', `/api/seating/assign/${gid}`, { table_id: tblId }, wcToken);
+    ok('assign guest HTTP 200', a.status === 200, JSON.stringify(a.data));
+  }
+
+  // ─── 25. Guest photo wall (public endpoint reachable) ───
+  console.log('\n--- Stage 24: guest photo wall ---');
+  const pwResp = await fetch(`${HOST}/api/guest-photos/${slug}`);
+  ok('photo wall public list HTTP 200', pwResp.status === 200);
+  const pwAdmin = await json('GET', '/api/guest-photos', null, wcToken);
+  ok('photo wall admin list HTTP 200', pwAdmin.status === 200);
+
+  // ─── 26. Activity feed ───
+  console.log('\n--- Stage 25: activity feed ---');
+  const act = await json('GET', '/api/activity', null, wcToken);
+  ok('activity HTTP 200', act.status === 200);
+  ok('activity contains local entries', Array.isArray(act.data?.activities) && act.data.activities.length > 0);
+
+  // ─── 27. Billing status (returns "not configured" gracefully) ───
+  console.log('\n--- Stage 26: billing status ---');
+  const bill = await json('GET', '/api/billing/status', null, wcToken);
+  ok('billing status HTTP 200', bill.status === 200);
+  ok('billing reports not-configured (no Stripe key)', bill.data?.configured === false);
+
+  // ─── 28. Hijri date rendered ───
+  console.log('\n--- Stage 27: hijri date in render ---');
+  const hResp = await fetch(`${HOST}/i/${slug}`);
+  const hHtml = await hResp.text();
+  ok('Hijri date present in rendered HTML', /(AH|هـ)/.test(hHtml));
+
   console.log('\n===== Summary =====');
   console.log('  Mailbox:    ', addr);
   console.log('  Slug:       ', slug);

@@ -5,6 +5,7 @@ const { t, months, weekdays } = require('./i18n');
 const { escapeHtml, safeUrl } = require('./util');
 const wl = require('./wishlisty');
 const { getWishlistyToken } = require('./wlToken');
+const { formatHijri } = require('./hijri');
 
 const THEMES_DIR = path.join(__dirname, '..', 'views', 'themes');
 const cache = new Map();
@@ -175,8 +176,16 @@ async function render(invitation, slug, guest = null) {
     ? await renderWishlistyRegistry(ownerRow.id, ownerRow.wishlisty_wishlist_id)
     : '';
 
+  let tableInfo = '';
+  if (guest?.seating_table_id) {
+    const t = db.prepare('SELECT name FROM seating_tables WHERE id = ?').get(guest.seating_table_id);
+    if (t) {
+      const label = lang === 'ar' ? 'طاولتك' : 'Your table';
+      tableInfo = `<span class="gg-table">${escapeHtml(label)}: <strong>${escapeHtml(t.name)}</strong></span>`;
+    }
+  }
   const guestGreeting = guest
-    ? `<div class="guest-greeting"><span class="gg-label">${escapeHtml(T.HELLO_GUEST)}</span><span class="gg-name">${escapeHtml(guest.name)}</span><span class="gg-note">${escapeHtml(T.PERSONAL_NOTE)}</span></div>`
+    ? `<div class="guest-greeting"><span class="gg-label">${escapeHtml(T.HELLO_GUEST)}</span><span class="gg-name">${escapeHtml(guest.name)}</span><span class="gg-note">${escapeHtml(T.PERSONAL_NOTE)}</span>${tableInfo}</div>`
     : '';
 
   // Live stream embed
@@ -243,6 +252,13 @@ async function render(invitation, slug, guest = null) {
     ACCENT_CSS: accentCss,
     OG_META: ogMeta,
     SAVE_THE_DATE_CLASS: invitation.save_the_date_only ? 'std-mode' : '',
+    HIJRI_DATE: escapeHtml(formatHijri(invitation.wedding_date, lang)),
+    GUEST_TABLE: guest?.seating_table_id
+      ? (() => {
+          const t = db.prepare('SELECT name FROM seating_tables WHERE id = ?').get(guest.seating_table_id);
+          return t ? escapeHtml(t.name) : '';
+        })()
+      : '',
   };
 
   // Translation tokens prefixed with T_
