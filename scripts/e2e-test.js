@@ -352,6 +352,56 @@ async function main() {
   const hHtml = await hResp.text();
   ok('Hijri date present in rendered HTML', /(AH|هـ)/.test(hHtml));
 
+  // ─── 29. Reduced motion toggle injected ───
+  console.log('\n--- Stage 28: reduced motion + motion toggle ---');
+  ok('motion toggle button injected', hHtml.includes('id="motion-toggle"'));
+  ok('reduced-motion media query in common css', (await (await fetch(`${HOST}/css/theme-common.css`)).text()).includes('prefers-reduced-motion'));
+
+  // ─── 30. SSE real-time stream ───
+  console.log('\n--- Stage 29: SSE real-time stream ---');
+  const ssePromise = new Promise((resolve, reject) => {
+    let received = false;
+    const t = setTimeout(() => reject(new Error('SSE timeout')), 10000);
+    fetch(`${HOST}/api/sse?token=${encodeURIComponent(wcToken)}`, { headers: { Accept: 'text/event-stream' } })
+      .then(async (r) => {
+        if (r.status !== 200) throw new Error('SSE status ' + r.status);
+        const reader = r.body.getReader();
+        const decoder = new TextDecoder();
+        let buf = '';
+        while (!received) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          buf += decoder.decode(value, { stream: true });
+          if (buf.includes('event: rsvp')) {
+            received = true;
+            clearTimeout(t);
+            try { reader.cancel(); } catch (_) {}
+            resolve(buf);
+          }
+        }
+      }).catch(reject);
+  });
+
+  // Trigger an event after a short delay so the SSE client is already connected
+  setTimeout(() => {
+    fetch(`${HOST}/api/rsvp/${slug}`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ guest_name: 'SSE Tester', attending: 'yes', guest_count: 1 }),
+    }).catch(() => {});
+  }, 1000);
+
+  try {
+    const sseData = await ssePromise;
+    ok('SSE delivered rsvp event', sseData.includes('SSE Tester'));
+  } catch (e) {
+    ok('SSE delivered rsvp event', false, e.message);
+  }
+
+  // ─── 31. SMS dev fallback (no Twilio configured — just check helper doesn't crash) ───
+  console.log('\n--- Stage 30: SMS endpoint exists (dev fallback) ---');
+  // No public API for sending arbitrary SMS — covered by unit tests + cron path.
+  ok('SMS module present', !!require('../src/sms')?.send);
+
   console.log('\n===== Summary =====');
   console.log('  Mailbox:    ', addr);
   console.log('  Slug:       ', slug);

@@ -991,4 +991,41 @@ document.getElementById('delete-acc').addEventListener('click', async (e) => {
   } catch (ex) { toast(ex.message, 'error'); e.target.disabled = false; }
 });
 
-load();
+// ─── Real-time updates via SSE ───
+let sseSource = null;
+function startSSE() {
+  if (sseSource) return;
+  try {
+    sseSource = new EventSource('/api/sse?token=' + encodeURIComponent(token));
+    sseSource.addEventListener('rsvp', (e) => {
+      const data = JSON.parse(e.data);
+      toast(`🎉 New RSVP: ${data.payload.guest_name} (${data.payload.attending})`);
+      loadStats();
+      if (document.getElementById('section-rsvps')?.classList.contains('active')) loadRsvps();
+    });
+    sseSource.addEventListener('wish', (e) => {
+      const data = JSON.parse(e.data);
+      toast(`💭 New wish from ${data.payload.guest_name}`);
+      loadStats();
+      if (document.getElementById('section-wishes')?.classList.contains('active')) loadWishes();
+    });
+    sseSource.addEventListener('music', (e) => {
+      const data = JSON.parse(e.data);
+      toast(`🎵 ${data.payload.guest_name} requested "${data.payload.song}"`);
+      if (document.getElementById('section-music')?.classList.contains('active')) loadMusic();
+    });
+    sseSource.addEventListener('photo', (e) => {
+      const data = JSON.parse(e.data);
+      toast(`📷 New photo from ${data.payload.guest_name} (pending review)`);
+      if (document.getElementById('section-photo-wall')?.classList.contains('active')) loadPhotoWall();
+    });
+    sseSource.onerror = () => {
+      // EventSource auto-reconnects; only log
+      console.warn('[sse] connection error, will retry');
+    };
+  } catch (e) {
+    console.warn('[sse] not supported', e);
+  }
+}
+
+load().then(() => startSSE());

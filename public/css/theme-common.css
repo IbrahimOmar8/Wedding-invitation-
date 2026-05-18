@@ -1,6 +1,53 @@
 /* Shared styles for new sections across all themes.
    Each theme defines its own color vars; this file uses them via fallbacks. */
 
+/* ── Reduced motion ──
+   Honor the user's OS preference automatically. Also expose a manual
+   override via `body.reduced-motion` so users on systems that don't set
+   the media query can still opt in via the toggle button. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .petals, .leaves, .stars, .sun { display: none !important; }
+  .hero-card::before { animation: none !important; }
+}
+body.reduced-motion *, body.reduced-motion *::before, body.reduced-motion *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+}
+body.reduced-motion .petals,
+body.reduced-motion .leaves,
+body.reduced-motion .stars,
+body.reduced-motion .sun { display: none !important; }
+body.reduced-motion .hero-card::before { animation: none !important; }
+
+/* The toggle button itself (injected by themes). */
+#motion-toggle {
+  position: fixed;
+  bottom: 1rem;
+  left: 1rem;
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  background: rgba(255,255,255,0.85);
+  color: var(--gold-d, #8a6620);
+  font-size: 1.1rem;
+  cursor: pointer;
+  z-index: 998;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0.75;
+}
+#motion-toggle:hover { opacity: 1; }
+#motion-toggle.on { background: var(--gold, #b78a3a); color: white; }
+[dir=rtl] #motion-toggle { left: auto; right: calc(1rem + 56px); }
+[dir=ltr] #music-toggle ~ #motion-toggle, body:not([dir=rtl]) #motion-toggle { right: auto; }
+
 .guest-greeting { padding: 1.2rem 1.5rem; margin: 0 auto 2rem; max-width: 480px; text-align: center; background: rgba(255,255,255,0.6); border: 1px dashed currentColor; border-radius: 8px; }
 .guest-greeting .gg-label { display: block; font-size: 0.75rem; letter-spacing: 0.3em; text-transform: uppercase; opacity: 0.7; margin-bottom: 0.3rem; }
 .guest-greeting .gg-name { display: block; font-size: 1.6rem; font-weight: 600; margin: 0.4rem 0; }

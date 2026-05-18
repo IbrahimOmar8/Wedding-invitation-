@@ -2,10 +2,12 @@ const express = require('express');
 const db = require('../db');
 const { authRequired } = require('../auth');
 const { send } = require('../email');
+const sms = require('../sms');
 const { sendToToken } = require('../push');
 const wl = require('../wishlisty');
 const { getWishlistyToken } = require('../wlToken');
 const { getAccessibleInvitation } = require('../access');
+const { publish } = require('../events');
 
 const router = express.Router();
 
@@ -16,7 +18,7 @@ router.post('/:slug', async (req, res) => {
   if (!guest_name || !attending) return res.status(400).json({ error: 'Name and attending status required' });
   if (!['yes', 'no'].includes(attending)) return res.status(400).json({ error: 'attending must be yes or no' });
 
-  const user = db.prepare('SELECT id, email, fcm_token FROM users WHERE slug = ?').get(slug);
+  const user = db.prepare('SELECT id, email, fcm_token, country_code FROM users WHERE slug = ?').get(slug);
   if (!user) return res.status(404).json({ error: 'Invitation not found' });
   const inv = db.prepare('SELECT id, groom_name, bride_name FROM invitations WHERE user_id = ?').get(user.id);
   if (!inv) return res.status(404).json({ error: 'Invitation not found' });
@@ -25,19 +27,23 @@ router.post('/:slug', async (req, res) => {
   const cleanName = String(guest_name).slice(0, 120);
   const cleanEmail = String(guest_email || '').slice(0, 200);
   const cleanMsg = String(message || '').slice(0, 500);
-  db.prepare(`
+  const info = db.prepare(`
     INSERT INTO rsvps (invitation_id, guest_name, guest_email, attending, guest_count, message)
     VALUES (?,?,?,?,?,?)
   `).run(inv.id, cleanName, cleanEmail, attending, count, cleanMsg);
 
-  // Fire-and-forget email
   send({
     to: user.email,
     subject: `New RSVP from ${cleanName} (${attending})`,
     text: `${cleanName} has responded to your wedding invitation.\n\nAttending: ${attending}\nGuests: ${count}\nMessage: ${cleanMsg || '(none)'}\n\n— WedCard`,
   }).catch(() => {});
 
-  // Push notification to owner
+  // SMS the owner if they've added a phone in their wish-listy profile
+  const ownerPhone = db.prepare('SELECT username FROM users WHERE id = ? AND username LIKE \'+%\'').get(user.id);
+  if (ownerPhone) {
+    sms.send(ownerPhone.username, `New RSVP: ${cleanName} (${attending}) for ${inv.groom_name} & ${inv.bride_name}'s wedding`).catch(() => {});
+  }
+
   if (user.fcm_token) {
     sendToToken(user.fcm_token, {
       title: `New RSVP — ${cleanName}`,
@@ -46,8 +52,9 @@ router.post('/:slug', async (req, res) => {
     }).catch(() => {});
   }
 
-  // Bridge to wish-listy EventInvitation when we can resolve a wishlisty user
   bridgeRsvpToWishlisty(user.id, { guest_name: cleanName, guest_email: cleanEmail, attending }).catch(() => {});
+
+  publish(inv.id, 'rsvp', { id: info.lastInsertRowid, guest_name: cleanName, attending, guest_count: count, message: cleanMsg });
 
   res.json({ ok: true });
 });

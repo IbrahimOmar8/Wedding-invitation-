@@ -6,6 +6,7 @@ const express = require('express');
 const db = require('../db');
 const { authRequired } = require('../auth');
 const { getAccessibleInvitation } = require('../access');
+const { publish } = require('../events');
 
 // Ensure the table exists. We co-locate this with the route rather than
 // touching src/db.js because it's a self-contained feature.
@@ -33,8 +34,11 @@ router.post('/:slug', (req, res) => {
   if (!user) return res.status(404).json({ error: 'Invitation not found' });
   const inv = db.prepare('SELECT id, published FROM invitations WHERE user_id = ?').get(user.id);
   if (!inv?.published) return res.status(404).json({ error: 'Invitation not found' });
-  db.prepare(`INSERT INTO music_requests (invitation_id, guest_name, song, artist, note) VALUES (?,?,?,?,?)`)
-    .run(inv.id, String(guest_name).slice(0, 120), String(song).slice(0, 200), String(artist || '').slice(0, 160), String(note || '').slice(0, 300));
+  const cleanName = String(guest_name).slice(0, 120);
+  const cleanSong = String(song).slice(0, 200);
+  const info = db.prepare(`INSERT INTO music_requests (invitation_id, guest_name, song, artist, note) VALUES (?,?,?,?,?)`)
+    .run(inv.id, cleanName, cleanSong, String(artist || '').slice(0, 160), String(note || '').slice(0, 300));
+  publish(inv.id, 'music', { id: info.lastInsertRowid, guest_name: cleanName, song: cleanSong, artist });
   res.json({ ok: true });
 });
 

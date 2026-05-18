@@ -31,6 +31,7 @@ const seatingRoutes = require('./src/routes/seating');
 const guestPhotosRoutes = require('./src/routes/guestPhotos');
 const activityRoutes = require('./src/routes/activity');
 const billingRoutes = require('./src/routes/billing');
+const sseRoutes = require('./src/routes/sse');
 const cronJobs = require('./src/cron');
 const geoip = require('geoip-lite');
 
@@ -79,6 +80,7 @@ app.use('/api/seating', seatingRoutes);
 app.use('/api/guest-photos', guestPhotosRoutes);
 app.use('/api/activity', activityRoutes);
 app.use('/api/billing', billingRoutes);
+app.use('/api/sse', sseRoutes);
 
 app.get('/api/themes', (req, res) => {
   const dir = path.join(__dirname, 'views', 'themes');

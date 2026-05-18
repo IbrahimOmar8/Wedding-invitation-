@@ -1,6 +1,7 @@
 const express = require('express');
 const db = require('../db');
 const { authRequired } = require('../auth');
+const { publish } = require('../events');
 
 const router = express.Router();
 
@@ -15,8 +16,11 @@ router.post('/:slug', (req, res) => {
   const inv = db.prepare('SELECT id FROM invitations WHERE user_id = ?').get(user.id);
   if (!inv) return res.status(404).json({ error: 'Invitation not found' });
 
-  db.prepare('INSERT INTO wishes (invitation_id, guest_name, message, approved) VALUES (?,?,?,1)')
-    .run(inv.id, String(guest_name).slice(0, 120), String(message).slice(0, 500));
+  const cleanName = String(guest_name).slice(0, 120);
+  const cleanMsg = String(message).slice(0, 500);
+  const info = db.prepare('INSERT INTO wishes (invitation_id, guest_name, message, approved) VALUES (?,?,?,1)')
+    .run(inv.id, cleanName, cleanMsg);
+  publish(inv.id, 'wish', { id: info.lastInsertRowid, guest_name: cleanName, message: cleanMsg });
   res.json({ ok: true });
 });
 

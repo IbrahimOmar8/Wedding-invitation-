@@ -563,5 +563,39 @@
 })();
 </script>
 
+
+<!-- MOT -->
+<button id="motion-toggle" type="button" aria-label="Toggle reduced motion" title="Toggle reduced motion">⊘</button>
+<script>
+(function() {
+  const KEY = 'wc-reduced-motion';
+  const btn = document.getElementById('motion-toggle');
+  if (!btn) return;
+  const body = document.body;
+
+  function apply(on) {
+    body.classList.toggle('reduced-motion', !!on);
+    btn.classList.toggle('on', !!on);
+    btn.textContent = on ? '◉' : '⊘';
+    btn.setAttribute('aria-pressed', String(!!on));
+  }
+
+  // Restore previous user choice or honor the OS preference
+  let stored = null;
+  try { stored = localStorage.getItem(KEY); } catch (_) {}
+  if (stored !== null) {
+    apply(stored === '1');
+  } else if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    apply(true);
+  }
+
+  btn.addEventListener('click', () => {
+    const next = !body.classList.contains('reduced-motion');
+    apply(next);
+    try { localStorage.setItem(KEY, next ? '1' : '0'); } catch (_) {}
+  });
+})();
+</script>
+
 </body>
 </html>

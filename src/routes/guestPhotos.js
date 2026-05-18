@@ -11,6 +11,7 @@ const db = require('../db');
 const { authRequired } = require('../auth');
 const { getAccessibleInvitation } = require('../access');
 const cloud = require('../cloudinary');
+const { publish } = require('../events');
 
 db.exec(`
   CREATE TABLE IF NOT EXISTS guest_photos (
@@ -72,8 +73,9 @@ router.post('/:slug', upload.single('file'), async (req, res) => {
 
   const guest_name = String(req.body?.guest_name || 'Anonymous').slice(0, 120);
   const caption = String(req.body?.caption || '').slice(0, 300);
-  db.prepare(`INSERT INTO guest_photos (invitation_id, guest_name, url, storage, storage_id, caption) VALUES (?,?,?,?,?,?)`)
+  const info = db.prepare(`INSERT INTO guest_photos (invitation_id, guest_name, url, storage, storage_id, caption) VALUES (?,?,?,?,?,?)`)
     .run(inv.id, guest_name, url, storageKind, storageId, caption);
+  publish(inv.id, 'photo', { id: info.lastInsertRowid, guest_name, url, caption });
   res.json({ ok: true, url, message: 'Thanks! Your photo is pending the couple\'s review.' });
 });
 
