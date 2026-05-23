@@ -6,7 +6,7 @@
 <title>Dashboard — WedCard</title>
 <link rel="stylesheet" href="/css/dashboard.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Cinzel:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Cinzel:wght@400;500;600&family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -18,26 +18,26 @@
       <a class="brand-name" href="/">WedCard</a>
       <div class="brand-link" id="brand-link">Loading…</div>
     </div>
-    <button class="nav-item active" data-section="details"><span class="ic">&#9998;</span>Details</button>
-    <button class="nav-item" data-section="images"><span class="ic">&#128247;</span>Images</button>
-    <button class="nav-item" data-section="events"><span class="ic">&#128467;</span>Events</button>
-    <button class="nav-item" data-section="story"><span class="ic">&#128214;</span>Our Story</button>
-    <button class="nav-item" data-section="registry"><span class="ic">&#127873;</span>Registry</button>
-    <button class="nav-item" data-section="theme"><span class="ic">&#127912;</span>Theme &amp; Lang</button>
-    <button class="nav-item" data-section="guests"><span class="ic">&#128101;</span>Guests</button>
-    <button class="nav-item" data-section="rsvps"><span class="ic">&#10004;</span>RSVPs</button>
-    <button class="nav-item" data-section="wishes"><span class="ic">&#128173;</span>Wishes</button>
-    <button class="nav-item" data-section="gifts"><span class="ic">&#127873;</span>Gift Tracking</button>
-    <button class="nav-item" data-section="cohosts"><span class="ic">&#128107;</span>Co-hosts</button>
-    <button class="nav-item" data-section="seating"><span class="ic">&#127860;</span>Seating</button>
-    <button class="nav-item" data-section="photo-wall"><span class="ic">&#128249;</span>Photo Wall</button>
-    <button class="nav-item" data-section="music"><span class="ic">&#127925;</span>Songs</button>
-    <button class="nav-item" data-section="activity"><span class="ic">&#128240;</span>Activity</button>
-    <button class="nav-item" data-section="analytics"><span class="ic">&#128202;</span>Analytics</button>
-    <button class="nav-item" data-section="settings"><span class="ic">&#9881;</span>Settings</button>
+    <button class="nav-item active" data-section="details"><span class="ic">&#9998;</span><span data-i18n="nav_details">Details</span></button>
+    <button class="nav-item" data-section="images"><span class="ic">&#128247;</span><span data-i18n="nav_images">Images</span></button>
+    <button class="nav-item" data-section="events"><span class="ic">&#128467;</span><span data-i18n="nav_events">Events</span></button>
+    <button class="nav-item" data-section="story"><span class="ic">&#128214;</span><span data-i18n="nav_story">Our Story</span></button>
+    <button class="nav-item" data-section="registry"><span class="ic">&#127873;</span><span data-i18n="nav_registry">Registry</span></button>
+    <button class="nav-item" data-section="theme"><span class="ic">&#127912;</span><span data-i18n="nav_theme">Theme &amp; Lang</span></button>
+    <button class="nav-item" data-section="guests"><span class="ic">&#128101;</span><span data-i18n="nav_guests">Guests</span></button>
+    <button class="nav-item" data-section="rsvps"><span class="ic">&#10004;</span><span data-i18n="nav_rsvps">RSVPs</span></button>
+    <button class="nav-item" data-section="wishes"><span class="ic">&#128173;</span><span data-i18n="nav_wishes">Wishes</span></button>
+    <button class="nav-item" data-section="gifts"><span class="ic">&#127873;</span><span data-i18n="nav_registry">Gift Tracking</span></button>
+    <button class="nav-item" data-section="cohosts"><span class="ic">&#128107;</span><span data-i18n="nav_cohosts">Co-hosts</span></button>
+    <button class="nav-item" data-section="seating"><span class="ic">&#127860;</span><span data-i18n="nav_seating">Seating</span></button>
+    <button class="nav-item" data-section="photo-wall"><span class="ic">&#128249;</span><span data-i18n="nav_photo_wall">Photo Wall</span></button>
+    <button class="nav-item" data-section="music"><span class="ic">&#127925;</span><span data-i18n="nav_music">Songs</span></button>
+    <button class="nav-item" data-section="activity"><span class="ic">&#128240;</span><span data-i18n="nav_activity">Activity</span></button>
+    <button class="nav-item" data-section="analytics"><span class="ic">&#128202;</span><span data-i18n="nav_analytics">Analytics</span></button>
+    <button class="nav-item" data-section="settings"><span class="ic">&#9881;</span><span data-i18n="nav_settings">Settings</span></button>
     <div class="nav-spacer"></div>
     <div class="signout">
-      <button class="nav-item" id="signout-btn"><span class="ic">&#8629;</span>Sign Out</button>
+      <button class="nav-item" id="signout-btn"><span class="ic">&#8629;</span><span data-i18n="nav_sign_out">Sign Out</span></button>
     </div>
   </aside>
 
@@ -58,7 +58,8 @@
               <h1>Wedding Details</h1>
               <p>Edit the names, date, venue and message shown on your invitation.</p>
             </div>
-            <a href="#" target="_blank" class="btn secondary" id="preview-btn">Open Invitation</a>
+            <a href="#" target="_blank" class="btn secondary" id="preview-btn" data-i18n="open_invitation">Open Invitation</a>
+            <a href="#" target="_blank" class="btn secondary" id="print-btn" style="margin-inline-start:0.4rem">🖨 Print / PDF</a>
           </div>
 
           <div class="stats-row" id="quick-stats">
@@ -445,6 +446,29 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- Floating UI language switcher -->
+<div id="ui-lang-switch" style="position:fixed;top:0.6rem;right:0.6rem;z-index:99;display:flex;gap:0.3rem;background:rgba(255,255,255,0.9);border:1px solid var(--border);border-radius:20px;padding:0.2rem;backdrop-filter:blur(6px)">
+  <button type="button" data-ui-lang="en" style="border:none;background:none;padding:0.3rem 0.7rem;border-radius:14px;cursor:pointer;font-size:0.78rem;letter-spacing:0.1em">EN</button>
+  <button type="button" data-ui-lang="ar" style="border:none;background:none;padding:0.3rem 0.7rem;border-radius:14px;cursor:pointer;font-size:0.95rem;font-family:Cairo,sans-serif">ع</button>
+</div>
+
+<script src="/js/dashboard-i18n.js"></script>
+<script>
+  // Apply stored language before the main script kicks in (no flash of English)
+  (function() {
+    const lang = localStorage.getItem('wc_ui_lang') || (navigator.language?.startsWith('ar') ? 'ar' : 'en');
+    window.applyDashboardI18n(lang);
+    document.querySelectorAll('[data-ui-lang]').forEach(b => {
+      if (b.dataset.uiLang === lang) b.style.background = 'var(--gold)', b.style.color = '#fff';
+      b.addEventListener('click', () => {
+        window.applyDashboardI18n(b.dataset.uiLang);
+        document.querySelectorAll('[data-ui-lang]').forEach(o => { o.style.background = ''; o.style.color = ''; });
+        b.style.background = 'var(--gold)'; b.style.color = '#fff';
+      });
+    });
+  })();
+</script>
 <script src="/js/dashboard.js"></script>
+<script src="/js/onboarding.js"></script>
 </body>
 </html>

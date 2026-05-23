@@ -171,3 +171,20 @@ table tr:last-child td { border-bottom: none; }
 
 .sidebar-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 40; }
 .sidebar-backdrop.open { display: block; }
+
+/* RTL support for Arabic dashboard */
+html[dir=rtl] body { font-family: 'Cairo', 'Cormorant Garamond', Georgia, serif; }
+html[dir=rtl] .app { grid-template-columns: 1fr 240px; }
+html[dir=rtl] .sidebar { border-right: none; border-left: 1px solid var(--border); }
+html[dir=rtl] .nav-item.active { border-right: none; border-left: 3px solid var(--gold); }
+html[dir=rtl] .layout-with-preview { grid-template-columns: 380px 1fr; }
+@media (max-width: 1100px) { html[dir=rtl] .layout-with-preview { grid-template-columns: 1fr; } }
+@media (max-width: 800px) {
+  html[dir=rtl] .app { grid-template-columns: 1fr; }
+  html[dir=rtl] .sidebar { left: auto; right: 0; transform: translateX(100%); }
+  html[dir=rtl] .sidebar.open { transform: none; }
+}
+html[dir=rtl] .field input, html[dir=rtl] .field textarea, html[dir=rtl] .field select { text-align: right; }
+html[dir=rtl] .num, html[dir=rtl] .stat-card .num { font-family: 'Cairo', sans-serif; letter-spacing: 0; }
+html[dir=rtl] .item-row, html[dir=rtl] .guest-row { direction: rtl; }
+html[dir=rtl] #ui-lang-switch { right: auto; left: 0.6rem; }

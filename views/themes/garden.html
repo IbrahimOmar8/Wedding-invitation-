@@ -636,5 +636,26 @@
 })();
 </script>
 
+
+<!-- ICS -->
+<script>
+(function() {
+  const SLUG = '{{SLUG}}';
+  document.querySelectorAll('a[href*="calendar/render"], .btn[href*="calendar.google.com"]').forEach(a => {
+    const wrap = document.createElement('span');
+    wrap.style.cssText = 'display:inline-flex;flex-direction:column;align-items:center;gap:0.4rem;margin-top:0.5rem';
+    a.parentNode.insertBefore(wrap, a);
+    wrap.appendChild(a);
+    const ics = document.createElement('a');
+    ics.href = '/i/' + SLUG + '/event.ics';
+    ics.setAttribute('download', SLUG + '.ics');
+    ics.className = a.className;
+    ics.textContent = (document.documentElement.lang === 'ar') ? 'Apple/Outlook' : 'Apple / Outlook';
+    ics.style.opacity = '0.85';
+    wrap.appendChild(ics);
+  });
+})();
+</script>
+
 </body>
 </html>

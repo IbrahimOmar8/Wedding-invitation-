@@ -402,6 +402,40 @@ async function main() {
   // No public API for sending arbitrary SMS — covered by unit tests + cron path.
   ok('SMS module present', !!require('../src/sms')?.send);
 
+  // ─── 32. ICS download ───
+  console.log('\n--- Stage 31: ICS calendar download ---');
+  const icsResp = await fetch(`${HOST}/i/${slug}/event.ics`);
+  const icsBody = await icsResp.text();
+  ok('ics HTTP 200', icsResp.status === 200);
+  ok('ics MIME type', icsResp.headers.get('content-type')?.startsWith('text/calendar'));
+  ok('ics has VCALENDAR', icsBody.includes('BEGIN:VCALENDAR') && icsBody.includes('END:VCALENDAR'));
+  ok('ics has summary with both names', icsBody.includes('Ibrahim') && icsBody.includes('Omnia'));
+
+  // ─── 33. Print/PDF view ───
+  console.log('\n--- Stage 32: print/PDF view ---');
+  const printResp = await fetch(`${HOST}/i/${slug}/print`);
+  const printBody = await printResp.text();
+  ok('print HTTP 200', printResp.status === 200);
+  ok('print injects window.print()', printBody.includes('window.print()'));
+  ok('print includes @media print', printBody.includes('@media print'));
+
+  // ─── 34. Dashboard i18n assets ───
+  console.log('\n--- Stage 33: dashboard i18n ---');
+  const i18nResp = await fetch(`${HOST}/js/dashboard-i18n.js`);
+  const i18nBody = await i18nResp.text();
+  ok('dashboard-i18n.js served', i18nResp.status === 200);
+  ok('Arabic translations present', i18nBody.includes('تفاصيل') && i18nBody.includes('الضيوف'));
+  const dashHtml = await (await fetch(`${HOST}/dashboard`)).text();
+  ok('dashboard has data-i18n markers', (dashHtml.match(/data-i18n="/g) || []).length >= 10);
+  ok('dashboard has UI lang switcher', dashHtml.includes('ui-lang-switch'));
+
+  // ─── 35. Onboarding script ───
+  console.log('\n--- Stage 34: onboarding wizard ---');
+  const obResp = await fetch(`${HOST}/js/onboarding.js`);
+  ok('onboarding.js served', obResp.status === 200);
+  const obBody = await obResp.text();
+  ok('onboarding has Arabic + English strings', obBody.includes('مرحباً') && obBody.includes('Welcome to WedCard'));
+
   console.log('\n===== Summary =====');
   console.log('  Mailbox:    ', addr);
   console.log('  Slug:       ', slug);

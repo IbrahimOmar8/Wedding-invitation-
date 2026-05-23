@@ -122,6 +122,56 @@ async function renderInvitation(slug, guestToken, res) {
 app.get('/i/:slug', (req, res) => renderInvitation(req.params.slug, null, res));
 app.get('/i/:slug/g/:token', (req, res) => renderInvitation(req.params.slug, req.params.token, res));
 
+// Print-friendly view: same render but with @media print styles + window.print() trigger
+app.get('/i/:slug/print', async (req, res) => {
+  const u = db.prepare('SELECT id FROM users WHERE slug = ?').get(req.params.slug);
+  if (!u) return res.status(404).end();
+  const row = db.prepare('SELECT * FROM invitations WHERE user_id = ? AND published = 1').get(u.id);
+  if (!row) return res.status(404).end();
+  const invitation = parseInvitation(row);
+  try {
+    const html = await render(invitation, req.params.slug, null);
+    // Inject print CSS that hides interactive elements + auto-prints
+    const printCss = `<style>
+      @media print {
+        #motion-toggle, #music-toggle, #reserve-modal, .rsvp-form, #music-form, #wish-form,
+        .share-row, #pw-upload, .pw-upload, #wishes-section .wish-form,
+        #ui-lang-switch { display: none !important; }
+        body { background: #fff !important; }
+        .hero, section.block { page-break-inside: avoid; }
+        a { color: inherit; text-decoration: none; }
+      }
+      @page { size: A4; margin: 1cm; }
+    </style>
+    <script>setTimeout(() => window.print(), 600);</script>`;
+    const out = html.replace('</head>', printCss + '</head>');
+    res.set('Content-Type', 'text/html; charset=utf-8').send(out);
+  } catch (e) {
+    res.status(500).end();
+  }
+});
+
+// ICS calendar download for any invitation slug
+const ics = require('./src/ics');
+app.get('/i/:slug/event.ics', (req, res) => {
+  const u = db.prepare('SELECT id FROM users WHERE slug = ?').get(req.params.slug);
+  if (!u) return res.status(404).end();
+  const i = db.prepare('SELECT * FROM invitations WHERE user_id = ? AND published = 1').get(u.id);
+  if (!i) return res.status(404).end();
+  const url = (process.env.PUBLIC_URL || ('http://' + req.headers.host)) + '/i/' + req.params.slug;
+  const out = ics.build({
+    groom: i.groom_name, bride: i.bride_name,
+    date: i.wedding_date, durationHours: 4,
+    venue: i.venue_name, address: i.venue_address,
+    description: i.quote, url,
+    uid: 'inv-' + i.id + '@wedcard',
+  });
+  if (!out) return res.status(400).end();
+  res.set('Content-Type', 'text/calendar; charset=utf-8');
+  res.set('Content-Disposition', `attachment; filename="${req.params.slug}.ics"`);
+  res.send(out);
+});
+
 ['login', 'signup', 'dashboard', 'verify-otp'].forEach(page => {
   app.get('/' + page, (req, res) => res.sendFile(path.join(__dirname, 'public', `${page}.html`)));
 });

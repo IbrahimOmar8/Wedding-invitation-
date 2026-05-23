@@ -139,6 +139,8 @@ function renderInvitation() {
 
   document.getElementById('brand-link').innerHTML = `<a href="/i/${user.slug}" target="_blank">/i/${user.slug}</a>`;
   document.getElementById('preview-btn').href = `/i/${user.slug}`;
+  const pb = document.getElementById('print-btn');
+  if (pb) pb.href = `/i/${user.slug}/print`;
 }
 
 async function loadStats() {
